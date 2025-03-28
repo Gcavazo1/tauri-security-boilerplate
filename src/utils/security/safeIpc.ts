@@ -10,7 +10,7 @@
 
 import { invoke } from '@tauri-apps/api/core';
 import { securityLogger, SecurityCategory } from './securityLogger';
-import { isValidJson, isCleanInput } from '../helpers/validation';
+import { isCleanInput } from '../helpers/validation';
 
 /**
  * Type for validation functions that verify data
@@ -123,7 +123,7 @@ export function createSafeIpc<P, R>(
       }
       
       // Invoke the command
-      const result = await invoke<unknown>(options.command, processedParams);
+      const result = await invoke<unknown>(options.command, processedParams as Record<string, unknown>);
       
       // Transform result if transformer provided
       let processedResult: R;
