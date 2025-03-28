@@ -38,7 +38,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/icon.ico"],
+    "icon": ["icons/icon.ico", "icons/icon.ico"],
     "resources": [],
     "externalBin": [],
     "copyright": "© 2024 Gcavazo1",
