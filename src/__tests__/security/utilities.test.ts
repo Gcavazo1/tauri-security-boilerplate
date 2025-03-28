@@ -115,6 +115,13 @@ jest.mock('../../utils/helpers/validation', () => ({
     if (typeof input !== 'string') {
       throw new Error('Input must be a string');
     }
-    return input.toString().trim();
+    
+    // Trim and limit length
+    let sanitized = input.toString().trim().slice(0, 1000);
+    
+    // Remove potential script tags
+    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    
+    return sanitized;
   }
 })); 
