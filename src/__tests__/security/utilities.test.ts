@@ -110,18 +110,11 @@ describe('Security Utilities', () => {
 });
 
 // Mock implementation of validateUserInput for testing purposes
-jest.mock('../../utils/security/inputValidation', () => ({
+jest.mock('../../utils/helpers/validation', () => ({
   validateUserInput: (input: unknown): string => {
     if (typeof input !== 'string') {
       throw new Error('Input must be a string');
     }
-    
-    // Trim and limit length
-    let sanitized = input.trim().slice(0, 1000);
-    
-    // Remove potential script tags
-    sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-    
-    return sanitized;
+    return input.toString().trim();
   }
 })); 
