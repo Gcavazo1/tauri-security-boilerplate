@@ -1,5 +1,8 @@
 // Add security-focused comments
-#![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
 #![allow(clippy::needless_return)]
 
 // Import modules
@@ -29,9 +32,9 @@ pub fn run() {
         .filter_level(LevelFilter::Info)
         .parse_default_env()
         .init();
-    
+
     info!("Starting application with enhanced security features");
-    
+
     // Run the Tauri application with security features
     match run_app() {
         Ok(_) => info!("Application exited successfully"),
@@ -67,4 +70,4 @@ fn run_app() -> Result<(), Box<dyn std::error::Error>> {
             error!("Failed to run application: {}", e);
             e.into()
         })
-} 
+}

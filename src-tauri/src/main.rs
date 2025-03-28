@@ -3,4 +3,4 @@
 
 fn main() {
     tauri_security_boilerplate_lib::run()
-} 
+}
