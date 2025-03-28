@@ -7,7 +7,7 @@ mod utils;
 
 // Import required dependencies
 use log::{error, info, LevelFilter};
-use std::{fs, path::Path, process};
+use std::process;
 
 // Security-focused error handling
 #[tauri::command]
@@ -44,13 +44,6 @@ pub fn run() {
 
 // Function to set up and run the Tauri application
 fn run_app() -> Result<(), Box<dyn std::error::Error>> {
-    // Manual check for tauri.conf.json
-    let config_path = Path::new("tauri.conf.json");
-    if !config_path.exists() {
-        error!("tauri.conf.json not found in current directory");
-        return Err("Configuration file not found".into());
-    }
-    
     // Build the Tauri application with security features
     tauri::Builder::default()
         // Register the security command handlers
@@ -69,12 +62,7 @@ fn run_app() -> Result<(), Box<dyn std::error::Error>> {
             utils::memory_safe::handle_sensitive_data,
             utils::memory_safe::validate_and_process_path,
         ])
-        // Load context manually instead of using the macro
-        .run(tauri::Context::new(
-            "com.gcavazo1.tauri-security",
-            "Tauri Security Boilerplate", 
-            "1.0.0"
-        )?)
+        .run(tauri::generate_context!())
         .map_err(|e| {
             error!("Failed to run application: {}", e);
             e.into()
