@@ -55,6 +55,17 @@ jobs:
         with:
           components: clippy, rustfmt
       
+      - name: Set PKG_CONFIG_PATH
+        run: echo "PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/share/pkgconfig" >> $GITHUB_ENV
+      
+      - name: Install Linux dependencies for linting
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
+          sudo add-apt-repository universe
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
+      
       - name: Format Rust code
         run: cd src-tauri && cargo fmt
       
@@ -95,10 +106,10 @@ jobs:
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
+          sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Rust Tests
         run: cd src-tauri && cargo test
@@ -154,10 +165,10 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
+          sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
