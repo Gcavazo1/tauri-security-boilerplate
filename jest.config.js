@@ -6,11 +6,17 @@ export default {
     '\\.(css|less|scss|sass)$': '<rootDir>/__mocks__/styleMock.js',
     '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/__mocks__/fileMock.js'
   },
-  testMatch: ['<rootDir>/src/**/*.test.(ts|tsx)'],
+  testMatch: [
+    '<rootDir>/src/**/*.test.{ts,tsx}',
+    '<rootDir>/src/__tests__/**/*.test.{ts,tsx}'
+  ],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
-      useESM: true,
+      useESM: false,
     }]
   },
-  extensionsToTreatAsEsm: ['.ts', '.tsx']
+  transformIgnorePatterns: [
+    "node_modules/(?!@tauri-apps)"
+  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 };
