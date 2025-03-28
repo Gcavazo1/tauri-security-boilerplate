@@ -8,6 +8,7 @@ repository = "https://github.com/Gcavazo1/tauri-security-boilerplate"
 edition = "2021"
 rust-version = "1.70"
 readme = "../README.md"
+build = "build.rs" # Explicitly specify the build script
 
 # Enable additional optimizations for release builds
 [profile.release]
