@@ -189,4 +189,24 @@ export function isValidJson(jsonString: string): boolean {
   } catch (e) {
     return false;
   }
+}
+
+/**
+ * Sanitizes and validates user input to prevent XSS and other injection attacks
+ * @param input The user input to validate
+ * @returns The sanitized input string
+ * @throws Error if the input is not a string
+ */
+export function validateUserInput(input: unknown): string {
+  if (typeof input !== 'string') {
+    throw new Error('Input must be a string');
+  }
+  
+  // Trim and limit length
+  let sanitized = input.trim().slice(0, 1000);
+  
+  // Remove potential script tags
+  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  return sanitized;
 } 
