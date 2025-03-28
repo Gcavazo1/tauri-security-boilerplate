@@ -1,63 +1,49 @@
 {
-  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-  "build": {
-    "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:1420",
-    "distDir": "../dist"
-  },
-  "package": {
-    "productName": "Tauri Security Boilerplate",
-    "version": "1.0.0"
-  },
-  "tauri": {
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.gcavazo1.tauri-security",
-      "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
-      "resources": [],
-      "externalBin": [],
-      "copyright": "© 2024 Gcavazo1",
-      "category": "DeveloperTool",
-      "shortDescription": "A Security-Focused Tauri 2.0 Boilerplate",
-      "longDescription": "A modern, cross-platform desktop application boilerplate with enterprise-grade security features built with Tauri 2.0",
-      "deb": {
-        "depends": []
-      },
-      "macOS": {
-        "frameworks": [],
-        "minimumSystemVersion": "10.13",
-        "exceptionDomain": "",
-        "signingIdentity": null,
-        "providerShortName": null,
-        "entitlements": null
-      },
-      "windows": {
-        "certificateThumbprint": null,
-        "digestAlgorithm": "sha256",
-        "timestampUrl": ""
-      }
-    },
+  "$schema": "https://beta.tauri.app/schemas/config.json",
+  "identifier": "com.gcavazo1.tauri-security",
+  "version": "1.0.0",
+  "productName": "Tauri Security Boilerplate",
+  "app": {
     "security": {
-      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; block-all-mixed-content; upgrade-insecure-requests"
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://api.github.com ipc: http://ipc.localhost; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; block-all-mixed-content; upgrade-insecure-requests"
     },
     "windows": [
       {
-        "fullscreen": false,
-        "resizable": true,
         "title": "Tauri Security Boilerplate",
         "width": 1200,
         "height": 800,
+        "resizable": true,
+        "fullscreen": false,
         "minWidth": 800,
-        "minHeight": 600
+        "minHeight": 600,
+        "label": "main"
       }
     ]
+  },
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "plugins": {
+    "fs": {
+      "requireLiteralLeadingDot": true
+    },
+    "dialog": null,
+    "shell": {
+      "open": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/icon.ico"],
+    "resources": [],
+    "externalBin": [],
+    "copyright": "© 2024 Gcavazo1",
+    "category": "DeveloperTool",
+    "shortDescription": "A Security-Focused Tauri 2.0 Boilerplate",
+    "longDescription": "A modern, cross-platform desktop application boilerplate with enterprise-grade security features built with Tauri 2.0"
   }
 }
