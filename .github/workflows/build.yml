@@ -86,6 +86,9 @@ jobs:
       - name: ESLint Check
         run: npm run lint
       
+      - name: Run Prettier to fix issues
+        run: npm run format
+      
       - name: Prettier Check
         run: npm run format:check
 
