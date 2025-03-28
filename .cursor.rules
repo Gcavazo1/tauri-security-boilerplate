@@ -1,0 +1,102 @@
+{
+  "projectName": "file-rename-tool",
+  "description": "A desktop application for batch renaming files with various patterns and options",
+  "codingConventions": {
+    "namingConventions": {
+      "files": {
+        "components": "PascalCase.tsx", 
+        "utilities": "camelCase.ts",
+        "hooks": "useNameInCamelCase.ts",
+        "constants": "CONSTANTS.ts",
+        "types": "types.ts"
+      },
+      "variables": "camelCase",
+      "functions": "camelCase",
+      "components": "PascalCase",
+      "interfaces": "IPascalCase",
+      "types": "TPascalCase",
+      "enums": "EPascalCase"
+    },
+    "formatting": {
+      "indentation": "spaces",
+      "indentSize": 2,
+      "maxLineLength": 100,
+      "quoteStyle": "single"
+    }
+  },
+  "architecture": {
+    "frontend": {
+      "framework": "React + TypeScript",
+      "stateManagement": "Zustand",
+      "styling": "TailwindCSS"
+    },
+    "backend": {
+      "language": "Rust",
+      "framework": "Tauri"
+    },
+    "fileStructure": {
+      "src": "Frontend React code",
+      "src-tauri": "Rust backend code",
+      "components": "Should be organized by feature",
+      "hooks": "Custom React hooks",
+      "utils": "Utility functions"
+    }
+  },
+  "developerGuidelines": {
+    "commits": {
+      "convention": "conventional-commits",
+      "format": "<type>(<scope>): <description>",
+      "examples": [
+        "feat(ui): add file selection component",
+        "fix(core): resolve issue with renaming process",
+        "docs: update README with setup instructions"
+      ]
+    },
+    "pullRequests": {
+      "template": "Please describe the changes and link to any related issues",
+      "reviewRequirements": "At least one approval needed"
+    }
+  },
+  "aiAssistance": {
+    "contextRules": [
+      "This is a Tauri + React + TypeScript project for file renaming",
+      "Frontend uses React, TypeScript, and TailwindCSS",
+      "Backend uses Rust via Tauri for file system operations",
+      "Code should be modular and well-typed",
+      "Prioritize user experience and error handling",
+      "Follow the naming conventions specified above"
+    ],
+    "codeGeneration": {
+      "preferences": [
+        "Generate type-safe code with TypeScript interfaces",
+        "Include comments explaining complex logic",
+        "Use React hooks pattern for state and effects",
+        "Leverage Tauri APIs for file system operations",
+        "Implement error handling for all file operations"
+      ]
+    }
+  },
+  "fileOperations": {
+    "supportedPatterns": [
+      "PascalCase",
+      "camelCase",
+      "snake_case",
+      "kebab-case",
+      "UPPERCASE",
+      "lowercase"
+    ],
+    "numberingOptions": [
+      "Single digit (1, 2, 3)",
+      "Leading zeros (01, 02, 03)",
+      "Custom padding",
+      "Start number and increment"
+    ],
+    "advancedFeatures": [
+      "Find and replace",
+      "Regular expressions",
+      "Prefix/suffix addition",
+      "Remove characters",
+      "Date/time stamps"
+    ]
+  }
+}

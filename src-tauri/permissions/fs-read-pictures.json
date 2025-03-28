@@ -1,0 +1,7 @@
+{
+  "identifier": "fs:read-pictures",
+  "description": "Read access to the pictures directory",
+  "read": {
+    "allow": ["$PICTURE/**"]
+  }
+} 

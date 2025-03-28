@@ -1,0 +1,10 @@
+{
+  "identifier": "downloads-access",
+  "description": "Limited capability that only allows reading and writing to the Downloads folder",
+  "windows": ["main"],
+  "permissions": [
+    "dialog:allow-open",
+    "fs:read-downloads",
+    "fs:write-downloads"
+  ]
+} 

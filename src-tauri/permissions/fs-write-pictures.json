@@ -1,0 +1,7 @@
+{
+  "identifier": "fs:write-pictures",
+  "description": "Write access to the pictures directory",
+  "write": {
+    "allow": ["$PICTURE/**"]
+  }
+} 
