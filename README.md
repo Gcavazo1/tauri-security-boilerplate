@@ -45,7 +45,7 @@ A production-ready template for building secure, commercial-grade cross-platform
 - [Rust](https://www.rust-lang.org/tools/install) (stable, v1.70+)
 - [Tauri CLI](https://tauri.app/v1/guides/getting-started/prerequisites)
 
-### Installation
+## Installation
 
 1. Clone this template
 2. Install dependencies:
