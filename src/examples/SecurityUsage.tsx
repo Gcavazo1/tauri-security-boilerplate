@@ -17,6 +17,8 @@ import {
   verifyResourceIntegrity
 } from '../utils/security';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { secureGet, securePut } from '../utils/security/safeNetworkRequests';
+import { getSecureStorage } from '../utils/security/secureStorage';
 
 // Define expected object shapes with validators
 const createUserDataValidator = (data: unknown): data is UserData => {
@@ -34,7 +36,14 @@ const createUserDataValidator = (data: unknown): data is UserData => {
 interface UserData {
   id: string;
   name: string;
+  email: string;
   role: string;
+  status: 'active' | 'inactive';
+  result?: {
+    ok: boolean;
+    value?: any;
+    error?: string;
+  };
 }
 
 // Create safe IPC functions
@@ -159,7 +168,9 @@ const SecureUserProfile = withCapabilities({
       <div className="profile-content">
         <p><strong>ID:</strong> {userData.id}</p>
         <p><strong>Name:</strong> {userData.name}</p>
+        <p><strong>Email:</strong> {userData.email}</p>
         <p><strong>Role:</strong> {userData.role}</p>
+        <p><strong>Status:</strong> {userData.status}</p>
       </div>
       
       <button onClick={loadUserData}>Refresh Securely</button>
@@ -193,6 +204,38 @@ const SecurityUsageExample: React.FC = () => {
       </div>
     </ErrorBoundary>
   );
+};
+
+// Example of using secure network requests
+const fetchUserFromApi = async () => {
+  try {
+    const result = await secureGet<UserData>({
+      url: 'https://api.example.com/users/123',
+      validateResponse: true,
+      timeout: 5000
+    });
+    
+    return { ...result, result: { ok: true, value: result } };
+  } catch (err) {
+    return {
+      id: '',
+      name: '',
+      email: '',
+      role: '',
+      status: 'inactive',
+      result: { ok: false, error: (err as Error).message }
+    };
+  }
+};
+
+// Example of using secure storage
+const storeUserData = async (userData: UserData) => {
+  try {
+    const storage = getSecureStorage();
+    await storage.setItem('user', JSON.stringify(userData));
+  } catch (err) {
+    console.error(`Storage error: ${(err as Error).message}`);
+  }
 };
 
 export default SecurityUsageExample; 

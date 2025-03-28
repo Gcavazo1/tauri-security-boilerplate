@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from './components/layout/Layout';
 import Button from './components/common/Button';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -62,7 +62,7 @@ function App() {
           </Button>
         </div>
 
-        <ErrorBoundary>
+        <ErrorBoundary fallback={<div className="error-fallback">Something went wrong</div>}>
           <div className="bg-white dark:bg-gray-800 rounded shadow-md p-4">
             <h2 className="text-xl font-bold mb-4">Tauri Command Example</h2>
             <div className="flex flex-col space-y-4">
@@ -100,7 +100,7 @@ function App() {
           </div>
         </ErrorBoundary>
 
-        <ErrorBoundary>
+        <ErrorBoundary fallback={<div className="error-fallback">Something went wrong</div>}>
           <div className="bg-white dark:bg-gray-800 rounded shadow-md p-4">
             <h2 className="text-xl font-bold mb-4">File Dialog Example</h2>
             <div className="flex flex-col space-y-4">

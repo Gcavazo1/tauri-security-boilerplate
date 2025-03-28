@@ -73,31 +73,6 @@ const FileExplorer: React.FC = () => {
     return new Date(timestamp * 1000).toLocaleString();
   };
 
-  // Get file icon based on type
-  const getFileIcon = (file: FileInfo): string => {
-    if (file.isDirectory) {
-      return 'folder';
-    }
-    
-    switch (file.fileType.toLowerCase()) {
-      case 'pdf':
-        return 'pdf';
-      case 'jpg':
-      case 'jpeg':
-      case 'png':
-      case 'gif':
-        return 'image';
-      case 'doc':
-      case 'docx':
-        return 'document';
-      case 'xls':
-      case 'xlsx':
-        return 'spreadsheet';
-      default:
-        return 'file';
-    }
-  };
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
       <h2 className="text-xl font-semibold mb-4 dark:text-white">File Explorer</h2>

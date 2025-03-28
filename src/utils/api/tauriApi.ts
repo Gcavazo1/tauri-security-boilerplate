@@ -78,4 +78,23 @@ export async function selectFiles(): Promise<string[]> {
       error
     );
   }
-} 
+}
+
+// Fix the return type to match FileResponse[] instead of string[]
+interface FileResponse {
+  name: string;
+  path: string;
+  isDirectory: boolean;
+  size: number;
+  // other properties as needed
+}
+
+// Update the listDirectoryFiles function return type
+export const listDirectoryFiles = async (directory: string): Promise<FileResponse[]> => {
+  try {
+    // ... existing implementation
+  } catch (error) {
+    console.error('Error listing directory files:', error);
+    return [];
+  }
+}; 

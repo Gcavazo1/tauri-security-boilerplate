@@ -363,10 +363,10 @@ export const safeReadDir = withCapabilities(
       const entries = await readDir(path, options);
       
       // Sanitize entries
-      const sanitizedEntries: SafeDirectoryEntry[] = entries.map(entry => ({
+      const sanitizedEntries: SafeDirectoryEntry[] = entries.map((entry: any) => ({
         name: sanitizeFileName(entry.name || ''),
         path: entry.path,
-        children: entry.children ? entry.children.map(child => ({
+        children: entry.children ? entry.children.map((child: any) => ({
           name: sanitizeFileName(child.name || ''),
           path: child.path,
           isDirectory: child.children !== undefined,

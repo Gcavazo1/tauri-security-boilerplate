@@ -2,13 +2,22 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import ErrorBoundary from "./components/common/ErrorBoundary";
+import ErrorBoundary, { ErrorFallbackProps } from "./components/common/ErrorBoundary";
 
 // Custom error handler for critical root-level errors
 const handleRootError = (error: Error, errorInfo: React.ErrorInfo) => {
   console.error("Root level error:", error);
   console.error("Component stack:", errorInfo.componentStack);
 };
+
+// Define a proper error fallback component
+const ErrorFallback = ({ error, resetErrorBoundary }: ErrorFallbackProps) => (
+  <div className="error-container">
+    <h2>Something went wrong:</h2>
+    <pre>{error.message}</pre>
+    <button onClick={resetErrorBoundary}>Try again</button>
+  </div>
+);
 
 // Define a fallback UI for critical failures
 const rootFallback = (
@@ -39,7 +48,11 @@ const rootFallback = (
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <ErrorBoundary onError={handleRootError} fallback={rootFallback}>
+    <ErrorBoundary
+      onError={handleRootError}
+      FallbackComponent={ErrorFallback}
+      fallback={rootFallback}
+    >
       <App />
     </ErrorBoundary>
   </React.StrictMode>
