@@ -11,11 +11,11 @@ import {
   createObjectValidator,
   createArrayValidator 
 } from '../../utils/security/safeIpc';
-import { validateUserInput } from '../../utils/security/inputValidation';
+import { validateUserInput } from '../../utils/helpers/validation';
 
 // Mock the Tauri API
 jest.mock('@tauri-apps/api/core', () => ({
-  invoke: jest.fn().mockImplementation((cmd, args) => {
+  invoke: jest.fn().mockImplementation((cmd, _args) => {
     if (cmd === 'test_command') {
       return Promise.resolve({ success: true, data: 'test data' });
     }
