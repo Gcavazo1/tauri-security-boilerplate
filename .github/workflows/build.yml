@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [main]
+    branches: [clean-branch]
   pull_request:
-    branches: [main]
+    branches: [clean-branch]
 
 jobs:
   security-audit:
