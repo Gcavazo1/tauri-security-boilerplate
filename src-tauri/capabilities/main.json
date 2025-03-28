@@ -5,6 +5,9 @@
   "permissions": [
     "dialog:default",
     "dialog:allow-open",
-    "fs:default"
+    "fs:default",
+    "fs:scope-download",
+    "fs:allow-download-read",
+    "fs:allow-download-write"
   ]
 } 

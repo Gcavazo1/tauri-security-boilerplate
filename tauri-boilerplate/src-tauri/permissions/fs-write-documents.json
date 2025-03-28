@@ -1,7 +1,0 @@
-{
-  "identifier": "fs:write-documents",
-  "description": "Write access to the documents directory",
-  "write": {
-    "allow": ["$DOCUMENT/**"]
-  }
-} 

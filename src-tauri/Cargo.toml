@@ -24,17 +24,16 @@ name = "tauri_security_boilerplate_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-alpha", features = [] }
+tauri-build = { version = "2.1.0", features = [] }
 
 [dependencies]
 # Core Tauri dependencies
-tauri = { version = "2.0.0-alpha", features = ["devtools"] }
-serde = { version = "1.0.193", features = ["derive"] }
-serde_json = "1.0.108"
-tauri-plugin-dialog = "2.0.0-alpha"
-tauri-plugin-shell = "2.0.0-alpha"
-tauri-plugin-window = "2.0.0-alpha"
-tauri-plugin-fs = "2.0.0-alpha"
+tauri = { version = "2.4.0", features = ["devtools"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tauri-plugin-dialog = "2.0.0"
+tauri-plugin-shell = "2.0.0"
+tauri-plugin-fs = "2.0.0"
 
 # Logging and error handling
 log = "0.4.20"
@@ -74,3 +73,7 @@ generate-sbom = true
 # Enable cargo-audit checks at compile time
 [package.metadata.cargo-audit]
 ignore = []  # No CVEs to ignore at this time
+
+# Configure tauri-build to not require Windows resources
+[package.metadata.tauri-build]
+windows = { icon = [] }

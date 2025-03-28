@@ -1,7 +1,0 @@
-{
-  "identifier": "fs:read-downloads",
-  "description": "Read access to the downloads directory",
-  "read": {
-    "allow": ["$DOWNLOAD/**"]
-  }
-} 

@@ -4,7 +4,8 @@
   "windows": ["main"],
   "permissions": [
     "dialog:allow-open",
-    "fs:read-downloads",
-    "fs:write-downloads"
+    "fs:scope-download",
+    "fs:allow-download-read",
+    "fs:allow-download-write"
   ]
 } 

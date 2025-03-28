@@ -1,7 +1,0 @@
-{
-  "identifier": "fs:read-documents",
-  "description": "Read access to the documents directory",
-  "read": {
-    "allow": ["$DOCUMENT/**"]
-  }
-} 

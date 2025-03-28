@@ -1,7 +1,0 @@
-{
-  "identifier": "fs:write-downloads",
-  "description": "Write access to the downloads directory",
-  "write": {
-    "allow": ["$DOWNLOAD/**"]
-  }
-} 
