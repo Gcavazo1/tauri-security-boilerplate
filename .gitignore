@@ -22,6 +22,7 @@ build/
 src-tauri/target/
 src-tauri/WixTools/
 src-tauri/Cargo.lock
+src-tauri/gen/
 
 # Large binaries
 *.exe
@@ -59,4 +60,9 @@ src-tauri/Cargo.lock
 # Temporary files
 .tmp/
 .temp/
-.cache/ 
+.cache/
+
+# Project-specific
+Screenshot*.jpg
+file-rename-tool/
+tauri-boilerplate/ 

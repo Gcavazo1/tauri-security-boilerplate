@@ -1,172 +1,171 @@
-# Installation and Setup Guide
+# Installation Guide
 
-This guide will walk you through the process of setting up our security-enhanced Tauri 2.0 boilerplate for your project.
+This guide provides detailed instructions for setting up and running the Tauri 2.0 React Template application on various platforms.
 
 ## Prerequisites
 
-Before you begin, make sure you have the following installed:
+### All Platforms
 
-- **Node.js v18 or later** - [Download](https://nodejs.org/)
-- **Rust stable v1.70+** - [Install instructions](https://www.rust-lang.org/tools/install)
-- **Additional OS-specific dependencies** for Tauri development:
-  - **Windows**: Visual Studio C++ Build Tools
-  - **macOS**: Xcode Command Line Tools
-  - **Linux**: See [Tauri Linux Prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/#setting-up-linux)
+1. **Node.js** (v18 or later)
+   - Download and install from [nodejs.org](https://nodejs.org/)
+   - Verify installation: `node --version`
 
-## Installation Steps
+2. **Rust** (stable, v1.70+)
+   - Install using [rustup](https://rustup.rs/)
+   - Verify installation: `rustc --version`
 
-### 1. Clone the Repository
+3. **Git**
+   - Download and install from [git-scm.com](https://git-scm.com/downloads)
+   - Verify installation: `git --version`
 
-```bash
-git clone https://github.com/yourusername/tauri-security-boilerplate.git my-app
-cd my-app
-```
+### Platform-Specific Requirements
 
-### 2. Install Dependencies
+#### Windows
 
-```bash
-# Install npm dependencies
-npm install
+1. **Microsoft Visual Studio C++ Build Tools**
+   - Install the [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+   - Make sure to select "Desktop Development with C++"
 
-# Initialize pre-commit hooks for security checks
-npx husky install
-```
+2. **WebView2**
+   - Download and install from [Microsoft Edge WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/)
+   - Usually comes pre-installed on Windows 10 and 11
 
-### 3. Configure Your Application
+#### macOS
 
-#### Update Application Metadata
+1. **Xcode Command Line Tools**
+   ```bash
+   xcode-select --install
+   ```
 
-1. Edit `src-tauri/tauri.conf.json`:
-   - Modify `productName`, `identifier`, and `title` to match your application
-   - Adjust the window size and other properties as needed
+2. **Additional libraries**
+   ```bash
+   brew install openssl@1.1
+   ```
 
-2. Edit `src-tauri/Cargo.toml`:
-   - Update `name`, `description`, `authors`, and `repository` fields
-   - Keep the security-related dependencies and features as they are crucial for the security model
+#### Linux (Ubuntu/Debian)
 
-3. Edit `package.json`:
-   - Update `name`, `description`, `version`, and other metadata
-   - Keep the pinned dependency versions to maintain security
+1. **Essential build tools**
+   ```bash
+   sudo apt update
+   sudo apt install -y libwebkit2gtk-4.1-dev build-essential curl wget libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+   ```
 
-#### Configure Permissions
+## Setting Up the Project
 
-Review and modify the permission files in `src-tauri/permissions/` to match your application's needs. Each permission file follows this pattern:
+1. Clone the repository
+   ```bash
+   git clone https://github.com/your-username/tauri-react-template
+   cd tauri-react-template
+   ```
 
-```json
-{
-  "identifier": "fs:read-downloads",
-  "description": "Read access to the downloads directory",
-  "read": {
-    "allow": ["$DOWNLOAD/**"]
-  }
-}
-```
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-Adjust these to follow the principle of least privilege for your application's needs.
+3. Initialize pre-commit hooks
+   ```bash
+   npm run prepare
+   ```
 
-### 4. Customize the Security Features
+## Running the Application
 
-1. Modify the allowed domains for network requests in `src/utils/safeNetworkRequests.ts`:
-
-```typescript
-const ALLOWED_DOMAINS = [
-  'api.yourcompany.com',
-  'cdn.yourcompany.com',
-  // Add your domains here
-];
-```
-
-2. Review and update the Content Security Policy in `index.html` if needed.
-
-3. Adjust error handling and logging settings in `src/utils/securityLogging.ts` if necessary.
-
-### 5. Start Development Server
+### Development Mode
 
 ```bash
-npm run dev
-```
-
-This will start the development server with hot reloading for both the frontend and Tauri backend.
-
-### 6. Security Verification
-
-Before proceeding to production, run the following security checks:
-
-```bash
-# Check for NPM vulnerabilities
-npm run security:audit
-
-# Run Rust security audit
-cd src-tauri && cargo audit && cd ..
-
-# Verify Tauri capabilities
-python scripts/check_capabilities.py
-```
-
-## Building for Production
-
-When you're ready to create a production build:
-
-```bash
-npm run build
+npm run tauri dev
 ```
 
 This will:
-1. Build the frontend assets
-2. Compile the Rust backend with optimizations
-3. Create platform-specific distributables
+- Start the Vite development server for the React frontend
+- Compile the Rust backend
+- Launch the application with hot reload for the frontend
 
-The production builds will be available in the `src-tauri/target/release` directory.
-
-## Creating Installers
-
-To create installers for distribution:
+### Production Build
 
 ```bash
 npm run tauri build
 ```
 
-This will create installers in the `src-tauri/target/release/bundle` directory:
-- `.msi` and `.exe` for Windows
-- `.dmg` and `.app` for macOS
-- `.deb` and `.AppImage` for Linux
+This will create platform-specific installers in the `src-tauri/target/release/bundle` directory.
 
 ## Troubleshooting
 
-### Common Issues
+### Port Conflicts
 
-1. **Rust compilation errors**:
-   - Make sure you have the latest stable Rust version: `rustup update stable`
-   - Clean the build files: `cd src-tauri && cargo clean && cd ..`
+If you see an error like "Port 1420 is already in use":
 
-2. **Missing dependencies**:
-   - Check the console for specific errors about missing system dependencies
-   - Refer to the [Tauri prerequisites guide](https://tauri.app/v1/guides/getting-started/prerequisites)
+1. Edit `src-tauri/tauri.conf.json`
+2. Change the `devUrl` port (e.g., from 1420 to 1421)
+3. Restart the development process
 
-3. **Security audit failures**:
-   - Review the audit output for specific vulnerabilities
-   - Update dependencies if safe to do so
-   - Consider implementing mitigations if updates aren't available
+### Rust Compilation Errors
 
-### Getting Help
+1. Update Rust toolchain
+   ```bash
+   rustup update
+   ```
 
-If you encounter issues not covered by this guide:
+2. Clean the project and rebuild
+   ```bash
+   npm run clean
+   npm run tauri dev
+   ```
+
+### Dependency Issues
+
+1. Update all dependencies
+   ```bash
+   npm run update-deps
+   ```
+
+2. Clear npm cache if needed
+   ```bash
+   npm cache clean --force
+   ```
+
+### Platform-Specific Issues
+
+#### Windows
+
+- If you encounter "MSBuild.exe not found" errors, ensure Visual Studio Build Tools are correctly installed.
+- WebView2 issues can be resolved by manually installing the latest WebView2 Runtime.
+
+#### macOS
+
+- If you encounter code signing issues on macOS, you may need to set up a developer certificate.
+- For Apple Silicon (M1/M2) specific issues, ensure Rosetta 2 is installed for x86 dependencies.
+
+#### Linux
+
+- On some distributions, you may need to install additional WebKit dependencies.
+- For Ubuntu 22.04+: `sudo apt install libjavascriptcoregtk-4.1-dev libsoup-3.0-dev`
+
+## Advanced Configuration
+
+### Changing the Application Name
+
+1. Edit `src-tauri/tauri.conf.json` and update the `productName` field
+2. Edit `package.json` and update the `name` field
+3. Rebuild the application
+
+### Customizing Icons
+
+1. Replace the icon files in `src-tauri/icons/` 
+2. Run the following to regenerate icon sets:
+   ```bash
+   npm run tauri icon
+   ```
+
+### Adding Capabilities
+
+1. Edit the capability files in `src-tauri/capabilities/`
+2. Documentation on capabilities can be found in the [Tauri documentation](https://tauri.app/v2/api/js/)
+
+## Getting Help
+
+If you continue to have issues, please:
 
 1. Check the [Tauri documentation](https://tauri.app/v2/guides/)
-2. Search for similar issues in our [GitHub repository](https://github.com/yourusername/tauri-security-boilerplate/issues)
-3. Open a new issue with detailed information about the problem
-
-## Security Reporting
-
-If you discover a security vulnerability, please refer to our [SECURITY.md](./SECURITY.md) file for instructions on how to report it responsibly.
-
-## Next Steps
-
-Once your application is set up, you may want to:
-
-1. Customize the UI components in `src/components/`
-2. Add new Tauri commands in `src-tauri/src/commands.rs`
-3. Implement additional security features specific to your application's needs
-4. Set up your CI/CD pipeline using the provided GitHub Actions workflow
-
-For more information on working with the boilerplate, refer to the main [README.md](./README.md) and [SECURITY-MODEL.md](./SECURITY-MODEL.md) files. 
+2. Open an issue in the GitHub repository
+3. Join the [Tauri Discord](https://discord.com/invite/tauri) community 

@@ -2,6 +2,14 @@
 
 A production-ready template for building secure, commercial-grade cross-platform desktop applications with Tauri 2.0, React, TypeScript, and Tailwind CSS.
 
+## Recent Improvements
+
+- ✅ **Fixed Theme Toggle**: Properly implemented dark/light mode switching with Tailwind CSS
+- ✅ **Added Greet Command**: Implemented missing greet command functionality
+- ✅ **Enhanced Security**: Cleaned up memory-safe code to remove unused functions
+- ✅ **Improved Dialog Plugin**: Fixed configuration for proper file selection
+- ✅ **Content Security Policy**: Updated CSP to support Tauri IPC communication
+
 ## Features
 
 - 🚀 **Tauri 2.0**: Latest version with improved performance and security
