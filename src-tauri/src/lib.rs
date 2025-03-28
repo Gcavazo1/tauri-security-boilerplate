@@ -6,7 +6,7 @@
 mod utils;
 
 // Import required dependencies
-use log::{info, error, LevelFilter};
+use log::{error, info, LevelFilter};
 use std::process;
 
 // Security-focused error handling
