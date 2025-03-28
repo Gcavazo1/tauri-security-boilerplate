@@ -16,7 +16,7 @@ We take the security of this boilerplate and applications built with it seriousl
 
 Please **DO NOT** create a public GitHub issue for security vulnerabilities. Instead, report them privately through one of these channels:
 
-1. **Email**: security@example.com
+1. **Email**: gcavazo1@gmail.com
 2. **GitHub Security Advisories**: You can report vulnerabilities privately through GitHub's Security Advisories feature (preferred method).
 
 ### What to Include
