@@ -68,7 +68,10 @@ jobs:
       - name: Install Linux dependencies for linting
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common libglib2.0-dev libglib2.0-0 libgobject-2.0-dev pkg-config
+          # List available packages with glib and gobject to debug
+          sudo apt-cache search libglib
+          # Install proper development packages
+          sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
@@ -116,7 +119,8 @@ jobs:
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common libglib2.0-dev libglib2.0-0 libgobject-2.0-dev pkg-config
+          # Install proper development packages
+          sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
@@ -178,8 +182,10 @@ jobs:
           sudo apt-get install -y software-properties-common
           sudo add-apt-repository universe
           sudo apt-get update
-          # Install glib and gobject development packages explicitly
-          sudo apt-get install -y libglib2.0-0 libglib2.0-dev libgobject-2.0-dev pkg-config
+          # List available packages with glib to debug
+          sudo apt-cache search libglib
+          # Install glib development packages (which includes gobject)
+          sudo apt-get install -y libglib2.0-dev pkg-config
           # Check glib version
           pkg-config --modversion glib-2.0
           # Install other dependencies
