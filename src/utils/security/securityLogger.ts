@@ -13,14 +13,16 @@ export enum SecurityLevel {
 
 // Security event categories
 export enum SecurityCategory {
-  AUTHENTICATION = 'AUTHENTICATION',
-  AUTHORIZATION = 'AUTHORIZATION',
-  DATA_ACCESS = 'DATA_ACCESS',
-  INPUT_VALIDATION = 'INPUT_VALIDATION',
-  FILESYSTEM = 'FILESYSTEM',
-  NETWORK = 'NETWORK',
-  CONFIGURATION = 'CONFIGURATION',
-  DEPENDENCY = 'DEPENDENCY',
+  FILESYSTEM = 'filesystem',
+  NETWORK = 'network',
+  STORAGE = 'storage',
+  DATA_ACCESS = 'data_access',
+  INTEGRITY = 'integrity',
+  APPLICATION = 'application',
+  AUTHENTICATION = 'authentication',
+  PERMISSIONS = 'permissions',
+  INPUT_VALIDATION = 'input_validation',
+  CRYPTO = 'crypto'
 }
 
 // Interface for security events

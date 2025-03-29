@@ -1,13 +1,19 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { ErrorFallbackProps } from '../../utils/helpers/errorHandling';
 
-interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback: React.ComponentType<ErrorFallbackProps>;
-  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+export interface ErrorFallbackProps {
+  error: Error;
+  resetErrorBoundary: () => void;
 }
 
-interface ErrorBoundaryState {
+export interface ErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+  FallbackComponent?: React.ComponentType<ErrorFallbackProps>;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onReset?: () => void;
+}
+
+export interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
@@ -19,10 +25,8 @@ interface ErrorBoundaryState {
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { 
-      hasError: false,
-      error: null
-    };
+    this.state = { hasError: false, error: null };
+    this.resetErrorBoundary = this.resetErrorBoundary.bind(this);
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -40,22 +44,25 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
   }
 
-  resetErrorBoundary = (): void => {
+  resetErrorBoundary(): void {
     this.setState({
       hasError: false,
       error: null
     });
-  };
+    if (this.props.onReset) {
+      this.props.onReset();
+    }
+  }
 
   render(): ReactNode {
-    if (this.state.hasError && this.state.error) {
-      const { fallback: FallbackComponent } = this.props;
-      return (
-        <FallbackComponent
-          error={this.state.error}
-          resetErrorBoundary={this.resetErrorBoundary}
-        />
-      );
+    if (this.state.hasError) {
+      if (this.props.FallbackComponent) {
+        return <this.props.FallbackComponent 
+          error={this.state.error as Error} 
+          resetErrorBoundary={this.resetErrorBoundary} 
+        />;
+      }
+      return this.props.fallback || <div>Something went wrong</div>;
     }
 
     return this.props.children;

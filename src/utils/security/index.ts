@@ -1,79 +1,46 @@
 /**
- * Security utilities index file
+ * Security module entry point
  * 
- * This file exports all security-related utilities to make them easier to import.
+ * Re-exports security utilities for easy access throughout the application.
  */
 
 // Security logging
-export { 
-  SecurityLogger, 
-  securityLogger, 
-  SecurityLevel, 
+export {
+  securityLogger,
+  SecurityLevel,
   SecurityCategory,
   type SecurityEvent
 } from './securityLogger';
 
 // Secure storage
-export { 
-  SecureStorage, 
-  secureStorage 
+export {
+  getSecureStorage,
+  SecureStorage
 } from './secureStorage';
 
-// Capability validation
-export { 
-  CapabilityValidator, 
-  capabilityValidator, 
-  CapabilityCategory,
-  withCapabilities, 
-  type CapabilityRequirement 
-} from './capabilityValidator';
-
-// Safe IPC communication
-export { 
-  createSafeIpc, 
-  SafeIpcError,
-  isPrimitive,
-  isJsonObject,
-  createObjectValidator,
-  createSchemaValidator,
-  createArrayValidator
-} from './safeIpc';
-
 // Safe file handling
-export { 
-  safeReadTextFile,
-  safeWriteTextFile,
-  safeReadBinaryFile,
-  safeWriteBinaryFile,
-  safeReadDir,
-  safeCreateDir,
-  safeRemoveDir,
-  safeRemoveFile,
-  FileOperationError,
+export {
+  safeReadFile,
+  safeWriteFile,
   type SafeDirectoryEntry
 } from './safeFileHandling';
 
 // Safe network requests
 export {
-  safeFetch,
-  safeGet,
-  safePost,
-  safePut,
-  safeDelete,
-  NetworkSecurityError
+  secureGet,
+  securePut
 } from './safeNetworkRequests';
 
 // Resource integrity checking
 export {
-  loadResourceManifest,
-  calculateResourceHash,
-  verifyResourceIntegrity,
-  verifyAllResources,
-  generateResourceManifest,
-  IntegrityError,
-  type ResourceManifest,
-  type ResourceEntry
+  verifyResourceIntegrity
 } from './resourceIntegrity';
+
+// Re-export capabilities system
+export {
+  withCapabilities,
+  type Capability
+} from './capabilityValidator';
 
 /**
  * Example usage:

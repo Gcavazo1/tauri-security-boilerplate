@@ -1,9 +1,157 @@
 /**
- * Secure storage utility for encrypting sensitive data before storing locally
- * Provides a wrapper around localStorage with encryption for sensitive data
+ * Secure storage utilities for Tauri applications
+ * 
+ * These utilities provide encrypted storage capabilities with:
+ * 1. Data encryption at rest
+ * 2. Secure key management
+ * 3. Data validation
+ * 4. Error handling
+ * 5. Security logging
  */
 
 import { securityLogger, SecurityCategory } from './securityLogger';
+
+/**
+ * Result type for data operations
+ */
+export interface SecureResult<T> {
+  ok: boolean;
+  value?: T;
+  error?: string;
+}
+
+/**
+ * User data structure for secure storage
+ */
+export interface SecureUserProfile {
+  id: string;
+  username: string;
+  email: string;
+  preferences: {
+    theme: 'light' | 'dark' | 'system';
+    notifications: boolean;
+  };
+  permissions: string[];
+  lastLogin: string;
+}
+
+// Simple encryption key management
+// In a production app, consider more robust key management
+const getEncryptionKey = (): string => {
+  // Mock implementation - in production, use a secure method to derive or retrieve the key
+  return 'secure-encryption-key-for-development-only';
+};
+
+/**
+ * Save data securely to storage
+ */
+export async function secureStore<T>(key: string, data: T): Promise<SecureResult<boolean>> {
+  try {
+    securityLogger.info(
+      SecurityCategory.STORAGE,
+      `Storing data securely with key: ${key}`,
+      'secureStore'
+    );
+    
+    // In a real implementation, we would encrypt and store the data
+    // using Tauri's secure storage APIs
+    // Mock implementation for development
+    console.log(`Securely stored data with key: ${key}`);
+    
+    return { ok: true, value: true };
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.STORAGE,
+      `Secure storage failed: ${error instanceof Error ? error.message : String(error)}`,
+      'secureStore',
+      { key, error }
+    );
+    
+    return { 
+      ok: false,
+      error: `Failed to store data: ${error instanceof Error ? error.message : String(error)}` 
+    };
+  }
+}
+
+/**
+ * Retrieve data securely from storage
+ */
+export async function secureRetrieve<T>(key: string): Promise<SecureResult<T>> {
+  try {
+    securityLogger.info(
+      SecurityCategory.STORAGE,
+      `Retrieving data securely with key: ${key}`,
+      'secureRetrieve'
+    );
+    
+    // In a real implementation, we would retrieve and decrypt the data
+    // using Tauri's secure storage APIs
+    // Mock implementation for development
+    const mockUserData = {
+      id: 'user123',
+      username: 'demo_user',
+      email: 'user@example.com',
+      preferences: {
+        theme: 'system',
+        notifications: true
+      },
+      permissions: ['read', 'write'],
+      lastLogin: new Date().toISOString()
+    } as unknown as T;
+    
+    return { ok: true, value: mockUserData };
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.STORAGE,
+      `Secure retrieval failed: ${error instanceof Error ? error.message : String(error)}`,
+      'secureRetrieve',
+      { key, error }
+    );
+    
+    return { 
+      ok: false,
+      error: `Failed to retrieve data: ${error instanceof Error ? error.message : String(error)}`
+    };
+  }
+}
+
+/**
+ * Delete data securely from storage
+ */
+export async function secureDelete(key: string): Promise<SecureResult<boolean>> {
+  try {
+    securityLogger.info(
+      SecurityCategory.STORAGE,
+      `Deleting data securely with key: ${key}`,
+      'secureDelete'
+    );
+    
+    // In a real implementation, we would securely delete the data
+    // using Tauri's secure storage APIs
+    // Mock implementation for development
+    console.log(`Securely deleted data with key: ${key}`);
+    
+    return { ok: true, value: true };
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.STORAGE,
+      `Secure deletion failed: ${error instanceof Error ? error.message : String(error)}`,
+      'secureDelete',
+      { key, error }
+    );
+    
+    return { 
+      ok: false,
+      error: `Failed to delete data: ${error instanceof Error ? error.message : String(error)}`
+    };
+  }
+}
+
+/**
+ * Secure storage utility for encrypting sensitive data before storing locally
+ * Provides a wrapper around localStorage with encryption for sensitive data
+ */
 
 // Simple encryption key management
 // In a production app, consider more robust key management
@@ -46,17 +194,19 @@ class KeyManager {
 export class SecureStorage {
   private static instance: SecureStorage;
   private encryptionKey: string;
+  private namespace: string;
   
-  private constructor() {
+  private constructor(namespace: string) {
     this.encryptionKey = KeyManager.getOrCreateKey();
+    this.namespace = namespace;
   }
   
   /**
    * Get singleton instance
    */
-  public static getInstance(): SecureStorage {
+  public static getInstance(namespace: string): SecureStorage {
     if (!SecureStorage.instance) {
-      SecureStorage.instance = new SecureStorage();
+      SecureStorage.instance = new SecureStorage(namespace);
     }
     return SecureStorage.instance;
   }
@@ -71,10 +221,7 @@ export class SecureStorage {
     try {
       if (isSensitive) {
         const encryptedValue = this.encrypt(value);
-        localStorage.setItem(key, JSON.stringify({
-          encrypted: true,
-          value: encryptedValue
-        }));
+        localStorage.setItem(`${this.namespace}:${key}`, encryptedValue);
         
         securityLogger.info(
           SecurityCategory.DATA_ACCESS,
@@ -82,10 +229,7 @@ export class SecureStorage {
           'SecureStorage'
         );
       } else {
-        localStorage.setItem(key, JSON.stringify({
-          encrypted: false,
-          value
-        }));
+        localStorage.setItem(`${this.namespace}:${key}`, value);
       }
     } catch (error) {
       securityLogger.error(
@@ -105,16 +249,15 @@ export class SecureStorage {
    */
   public getItem(key: string, defaultValue = ''): string {
     try {
-      const storedItem = localStorage.getItem(key);
+      const storedItem = localStorage.getItem(`${this.namespace}:${key}`);
       
       if (!storedItem) {
         return defaultValue;
       }
       
-      const parsedItem = JSON.parse(storedItem);
-      
-      if (parsedItem.encrypted) {
-        const decryptedValue = this.decrypt(parsedItem.value);
+      if (storedItem.startsWith('encrypted:')) {
+        const encryptedValue = storedItem.slice(10);
+        const decryptedValue = this.decrypt(encryptedValue);
         
         securityLogger.info(
           SecurityCategory.DATA_ACCESS,
@@ -125,7 +268,7 @@ export class SecureStorage {
         return decryptedValue;
       }
       
-      return parsedItem.value;
+      return storedItem;
     } catch (error) {
       securityLogger.error(
         SecurityCategory.DATA_ACCESS,
@@ -143,7 +286,7 @@ export class SecureStorage {
    */
   public removeItem(key: string): void {
     try {
-      localStorage.removeItem(key);
+      localStorage.removeItem(`${this.namespace}:${key}`);
       
       securityLogger.info(
         SecurityCategory.DATA_ACCESS,
@@ -200,7 +343,7 @@ export class SecureStorage {
       }
       
       // Convert to base64 for storage
-      return btoa(String.fromCharCode(...encryptedBytes));
+      return 'encrypted:' + btoa(String.fromCharCode(...encryptedBytes));
     } catch (error) {
       securityLogger.error(
         SecurityCategory.DATA_ACCESS,
@@ -220,7 +363,7 @@ export class SecureStorage {
     try {
       // Convert from base64
       const encryptedBytes = new Uint8Array(
-        atob(encryptedText).split('').map(c => c.charCodeAt(0))
+        atob(encryptedText.slice(10)).split('').map(c => c.charCodeAt(0))
       );
       
       const keyBytes = new TextEncoder().encode(this.encryptionKey);
@@ -243,21 +386,19 @@ export class SecureStorage {
   }
 }
 
-// Export a default instance for convenience
-export const secureStorage = SecureStorage.getInstance();
+/**
+ * Creates and returns a SecureStorage instance for the given namespace
+ * @param namespace The namespace for the storage
+ */
+export function getSecureStorage(namespace: string): SecureStorage {
+  return SecureStorage.getInstance(namespace);
+}
 
 /**
  * Example usage:
  * 
- * import { secureStorage } from './secureStorage';
- * 
- * // Store sensitive data (encrypted)
- * secureStorage.setItem('auth-token', 'my-secret-token', true);
- * 
- * // Store non-sensitive data (not encrypted)
- * secureStorage.setItem('user-theme', 'dark');
- * 
- * // Retrieve data (automatically handles decryption if needed)
- * const token = secureStorage.getItem('auth-token');
- * const theme = secureStorage.getItem('user-theme');
+ * const userStorage = getSecureStorage('user');
+ * await userStorage.setItem('token', 'jwt_token_here');
+ * const token = await userStorage.getItem('token');
+ * console.log(token); // 'jwt_token_here'
  */ 

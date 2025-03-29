@@ -55,16 +55,14 @@ export function sanitizeFileName(filename: string): string {
  * @returns True if the URL is valid, false otherwise
  */
 export function isValidUrl(url: string): boolean {
+  if (!url) return false;
+  
   try {
-    const parsedUrl = new URL(url);
-    
-    // Only allow http and https protocols
-    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-      return false;
-    }
-    
-    return true;
-  } catch (e) {
+    // Try to create a URL object to validate
+    const urlObj = new URL(url);
+    // Check for http/https protocol
+    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+  } catch {
     return false;
   }
 }
@@ -75,39 +73,9 @@ export function isValidUrl(url: string): boolean {
  * @returns True if the string is clean, false if it might contain injection attempts
  */
 export function isCleanInput(input: string): boolean {
-  // Check for common script injection patterns
-  const scriptPatterns = [
-    /<script\b[^>]*>(.*?)<\/script>/i,
-    /javascript:/i,
-    /on\w+\s*=/i, // onclick=, onload=, etc.
-    /data:\s*text\/html/i
-  ];
-
-  for (const pattern of scriptPatterns) {
-    if (pattern.test(input)) {
-      return false;
-    }
-  }
-
-  // Check for SQL injection patterns
-  const sqlPatterns = [
-    /'\s*or\s*'1'='1/i,
-    /'\s*or\s*1=1/i,
-    /'\s*or\s*'\w+'='\w+/i,
-    /'\s*;\s*drop\s+table/i,
-    /'\s*;\s*select\s+/i,
-    /'\s*;\s*insert\s+/i,
-    /'\s*;\s*update\s+/i,
-    /'\s*;\s*delete\s+/i
-  ];
-
-  for (const pattern of sqlPatterns) {
-    if (pattern.test(input)) {
-      return false;
-    }
-  }
-
-  return true;
+  if (!input) return true;
+  
+  return isCleanSql(input) && isCleanHtml(input);
 }
 
 /**
@@ -209,4 +177,93 @@ export function validateUserInput(input: unknown): string {
   sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   
   return sanitized;
+}
+
+/**
+ * Check if a string doesn't contain SQL injection patterns
+ */
+export function isCleanSql(input: string): boolean {
+  if (!input) return true;
+  
+  // Simple check for common SQL injection patterns
+  const sqlPatterns = [
+    /\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|EXEC)\b/i,
+    /(['"]);/,
+    /--/,
+    /\/\*/,
+    /\bOR\s+\d+=\d+\b/i,
+    /\bOR\s+'.*?'='.*?'/i
+  ];
+  
+  return !sqlPatterns.some(pattern => pattern.test(input));
+}
+
+/**
+ * Check if a string is clean of potentially dangerous HTML/JS content
+ */
+export function isCleanHtml(input: string): boolean {
+  if (!input) return true;
+  
+  // Check for script tags, event handlers, etc.
+  const dangerousPatterns = [
+    /<script/i,
+    /javascript:/i,
+    /on\w+=/i, // onclick, onload, etc.
+    /<iframe/i,
+    /<embed/i,
+    /data:/i // data URLs can contain executable content
+  ];
+  
+  return !dangerousPatterns.some(pattern => pattern.test(input));
+}
+
+/**
+ * Validate an email address format
+ */
+export function isValidEmail(email: string): boolean {
+  if (!email) return false;
+  
+  // RFC 5322 compliant regex
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  
+  return emailRegex.test(email);
+}
+
+/**
+ * Check if a password meets security requirements
+ * - At least 8 characters
+ * - Contains at least one uppercase letter
+ * - Contains at least one lowercase letter
+ * - Contains at least one digit
+ * - Contains at least one special character
+ */
+export function isStrongPassword(password: string): boolean {
+  if (!password || password.length < 8) return false;
+  
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasLowercase = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+  
+  return hasUppercase && hasLowercase && hasDigit && hasSpecial;
+}
+
+/**
+ * Validate that a filename doesn't contain path traversal or invalid characters
+ */
+export function isValidFilename(filename: string): boolean {
+  if (!filename) return false;
+  
+  // Check for directory traversal
+  if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+    return false;
+  }
+  
+  // Check for invalid characters (depends on OS, this is a basic check)
+  const invalidChars = /[<>:"|?*\x00-\x1F]/;
+  if (invalidChars.test(filename)) {
+    return false;
+  }
+  
+  return true;
 } 
