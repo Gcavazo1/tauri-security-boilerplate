@@ -68,12 +68,12 @@ jobs:
       - name: Install Linux dependencies for linting
         run: |
           sudo apt-get update
-          # List available packages with glib and gobject to debug
-          sudo apt-cache search libglib
           # Install proper development packages
           sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
+          # Verify glib installation
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Format Rust code
@@ -123,6 +123,8 @@ jobs:
           sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
+          # Verify glib installation
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Rust Tests
@@ -179,17 +181,26 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
+          sudo apt-get install -y software-properties-common pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
-          # List available packages with glib to debug
-          sudo apt-cache search libglib
-          # Install glib development packages (which includes gobject)
-          sudo apt-get install -y libglib2.0-dev pkg-config
-          # Check glib version
-          pkg-config --modversion glib-2.0
+          
+          # Explicitly install GLib dependencies
+          sudo apt-get install -y libglib2.0-0 libglib2.0-dev
+          
+          # Verify GLib is properly installed
+          dpkg -l | grep libglib
+          pkg-config --modversion glib-2.0 || echo "pkg-config couldn't find glib-2.0"
+          
+          # Check for .pc file
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
+          
           # Install other dependencies
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libdbus-1-dev
+          
+          # Final verification of PKG_CONFIG_PATH
+          echo "PKG_CONFIG_PATH is set to: $PKG_CONFIG_PATH"
+          pkg-config --list-all | grep glib
       
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
