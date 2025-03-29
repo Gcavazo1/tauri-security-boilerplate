@@ -6,8 +6,16 @@
 [![GitHub releases](https://img.shields.io/github/downloads/Gcavazo1/tauri-security-boilerplate/total)](https://github.com/Gcavazo1/tauri-security-boilerplate/releases)
 [![GitHub issues](https://img.shields.io/github/issues/Gcavazo1/tauri-security-boilerplate)](https://github.com/Gcavazo1/tauri-security-boilerplate/issues)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2FGcavazo1.github.io%2Ftauri-security-boilerplate)](https://Gcavazo1.github.io/tauri-security-boilerplate)
+[![Release](https://img.shields.io/github/v/release/Gcavazo1/tauri-security-boilerplate)](https://github.com/Gcavazo1/tauri-security-boilerplate/releases/latest)
+[![Security Audit](https://img.shields.io/badge/security-audited-success)](https://github.com/Gcavazo1/tauri-security-boilerplate/actions)
 
 A production-ready template for building secure, commercial-grade cross-platform desktop applications with Tauri 2.0, React, TypeScript, and Tailwind CSS.
+
+## Latest Release: v1.0.0
+
+We've officially released v1.0.0 with full cross-platform support for Windows, macOS, and Ubuntu! Check out our [release notes](https://github.com/Gcavazo1/tauri-security-boilerplate/releases/tag/v1.0.0) for details.
+
+Visit our [documentation site](https://Gcavazo1.github.io/tauri-security-boilerplate) for comprehensive guides and security information.
 
 ## Recent Improvements
 
