@@ -1,4 +1,11 @@
-# Tauri 2.0 React Template
+# Tauri Security Boilerplate
+
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Gcavazo1/tauri-security-boilerplate/build.yml?branch=clean-branch)](https://github.com/Gcavazo1/tauri-security-boilerplate/actions)
+[![GitHub stars](https://img.shields.io/github/stars/Gcavazo1/tauri-security-boilerplate)](https://github.com/Gcavazo1/tauri-security-boilerplate/stargazers)
+[![GitHub license](https://img.shields.io/github/license/Gcavazo1/tauri-security-boilerplate)](https://github.com/Gcavazo1/tauri-security-boilerplate/blob/main/LICENSE)
+[![GitHub releases](https://img.shields.io/github/downloads/Gcavazo1/tauri-security-boilerplate/total)](https://github.com/Gcavazo1/tauri-security-boilerplate/releases)
+[![GitHub issues](https://img.shields.io/github/issues/Gcavazo1/tauri-security-boilerplate)](https://github.com/Gcavazo1/tauri-security-boilerplate/issues)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2FGcavazo1.github.io%2Ftauri-security-boilerplate)](https://Gcavazo1.github.io/tauri-security-boilerplate)
 
 A production-ready template for building secure, commercial-grade cross-platform desktop applications with Tauri 2.0, React, TypeScript, and Tailwind CSS.
 
