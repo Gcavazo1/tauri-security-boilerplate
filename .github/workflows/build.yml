@@ -72,9 +72,14 @@ jobs:
           sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
+          # Install JavaScriptCore GTK dependency
+          sudo apt-get install -y libjavascriptcoregtk-4.1-dev
           # Verify glib installation
           ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
           pkg-config --modversion glib-2.0
+          # Verify javascriptcoregtk installation
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/javascriptcoregtk-4.1.pc || echo "javascriptcoregtk-4.1.pc not found"
+          pkg-config --modversion javascriptcoregtk-4.1 || echo "javascriptcoregtk-4.1 not found by pkg-config"
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Format Rust code
@@ -124,9 +129,14 @@ jobs:
           sudo apt-get install -y software-properties-common libglib2.0-dev pkg-config
           sudo add-apt-repository universe
           sudo apt-get update
+          # Install JavaScriptCore GTK dependency
+          sudo apt-get install -y libjavascriptcoregtk-4.1-dev
           # Verify glib installation
           ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
           pkg-config --modversion glib-2.0
+          # Verify javascriptcoregtk installation
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/javascriptcoregtk-4.1.pc || echo "javascriptcoregtk-4.1.pc not found"
+          pkg-config --modversion javascriptcoregtk-4.1 || echo "javascriptcoregtk-4.1 not found by pkg-config"
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf || sudo apt-get install -y libwebkit2gtk-4.1-dev
       
       - name: Rust Tests
@@ -193,12 +203,22 @@ jobs:
           # Explicitly install GLib dependencies
           sudo apt-get install -y libglib2.0-0 libglib2.0-dev
           
+          # Install JavaScriptCore GTK dependency
+          sudo apt-get install -y libjavascriptcoregtk-4.1-dev
+          
           # Verify GLib is properly installed and check version
           echo "Installed GLib packages:"
           dpkg -l | grep libglib
           
           echo "GLib version from pkg-config:"
           pkg-config --modversion glib-2.0
+          
+          # Verify JavaScriptCore GTK installation
+          echo "Installed JavaScriptCore GTK packages:"
+          dpkg -l | grep javascriptcore
+          
+          echo "JavaScriptCore GTK version from pkg-config:"
+          pkg-config --modversion javascriptcoregtk-4.1 || echo "javascriptcoregtk-4.1 not found by pkg-config"
           
           # Check GLib version requirement
           echo "Required GLib version for glib-sys crate:"
@@ -208,12 +228,15 @@ jobs:
           echo "Looking for glib-2.0.pc file:"
           ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/glib-2.0.pc || echo "glib-2.0.pc not found"
           
+          echo "Looking for javascriptcoregtk-4.1.pc file:"
+          ls -la /usr/lib/x86_64-linux-gnu/pkgconfig/javascriptcoregtk-4.1.pc || echo "javascriptcoregtk-4.1.pc not found"
+          
           # Install other dependencies
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libdbus-1-dev
           
           # Final verification of PKG_CONFIG_PATH
           echo "PKG_CONFIG_PATH is set to: $PKG_CONFIG_PATH"
-          pkg-config --list-all | grep glib
+          pkg-config --list-all | grep -E 'glib|javascript'
       
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
