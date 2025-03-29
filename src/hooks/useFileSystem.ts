@@ -1,7 +1,9 @@
-import { useState, useCallback } from 'react';
-import { getFileInfo, listDirectoryFiles, selectDirectory, selectFiles, FileInfo } from '../utils/api/tauriApi';
+import { useState, useCallback, useEffect } from 'react';
+import { getFileInfo, selectFiles, FileInfo } from '../utils/api/tauriApi';
 import { useAppStore } from '../stores/appStore';
 import { open } from '@tauri-apps/plugin-dialog';
+import { FileEntry, FileResponse, listDirectoryFiles, selectDirectory } from '../utils/security/tauriApi';
+import { securityLogger, SecurityCategory } from '../utils/security/securityLogger';
 
 /**
  * Custom hook for file system operations
@@ -16,9 +18,28 @@ interface UseFileSystemReturnType {
   browseFiles: () => Promise<string[]>;
 }
 
-export function useFileSystem(): UseFileSystemReturnType {
+interface UseFileSystemProps {
+  initialDirectory?: string;
+  autoLoad?: boolean;
+}
+
+interface UseFileSystemResult {
+  files: FileEntry[];
+  currentDirectory: string | null;
+  isLoading: boolean;
+  error: string | null;
+  listFiles: (directory?: string) => Promise<void>;
+  selectAndLoadDirectory: () => Promise<string | undefined>;
+}
+
+export function useFileSystem({
+  initialDirectory,
+  autoLoad = false
+}: UseFileSystemProps = {}): UseFileSystemResult {
+  const [files, setFiles] = useState<FileEntry[]>([]);
+  const [currentDirectory, setCurrentDirectory] = useState<string | null>(initialDirectory || null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { setError: setGlobalError } = useAppStore();
 
   /**
@@ -33,7 +54,7 @@ export function useFileSystem(): UseFileSystemReturnType {
       return fileInfo;
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
+      setError(error.message);
       setGlobalError(error.message);
       return null;
     } finally {
@@ -44,31 +65,46 @@ export function useFileSystem(): UseFileSystemReturnType {
   /**
    * List files in a directory
    */
-  const listFiles = useCallback(async (dirPath: string, recursive = false): Promise<FileInfo[]> => {
-    setIsLoading(true);
-    setError(null);
+  const listFiles = useCallback(async (directory?: string): Promise<void> => {
+    // If no directory is specified, use the current directory
+    const targetDir = directory || currentDirectory;
+    if (!targetDir) {
+      setError('No directory specified');
+      return;
+    }
     
     try {
-      const files = await listDirectoryFiles(dirPath, recursive);
-      return files.map(file => ({
-        id: file.id || crypto.randomUUID(),
-        name: file.name || '',
-        path: file.path || '',
-        isDirectory: file.isDirectory || false,
-        size: file.size || 0,
-        lastModified: file.lastModified || Date.now() / 1000,
-        fileType: file.fileType || ''
-      }));
+      setIsLoading(true);
+      setError(null);
+      
+      securityLogger.info(
+        SecurityCategory.FILE_SYSTEM,
+        `Listing files in directory: ${targetDir}`,
+        'useFileSystem.listFiles'
+      );
+
+      const response: FileResponse = await listDirectoryFiles(targetDir);
+      
+      if (response.error) {
+        setError(response.error);
+      } else {
+        setFiles(response.files);
+        setCurrentDirectory(targetDir);
+      }
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
-      setGlobalError(error.message);
-      return [];
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to list files: ${errorMessage}`);
+      securityLogger.error(
+        SecurityCategory.FILE_SYSTEM,
+        `Error listing files: ${errorMessage}`,
+        'useFileSystem.listFiles',
+        { directory: targetDir, error: err }
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [setGlobalError]);
-
+  }, [currentDirectory]);
+  
   /**
    * Open directory selection dialog
    */
@@ -85,7 +121,7 @@ export function useFileSystem(): UseFileSystemReturnType {
       return selectedDir ? selectedDir.toString() : null;
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
+      setError(error.message);
       setGlobalError(error.message);
       return null;
     } finally {
@@ -105,7 +141,7 @@ export function useFileSystem(): UseFileSystemReturnType {
       return selectedFiles;
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      setError(error);
+      setError(error.message);
       setGlobalError(error.message);
       return [];
     } finally {
@@ -113,12 +149,59 @@ export function useFileSystem(): UseFileSystemReturnType {
     }
   }, [setGlobalError]);
 
+  /**
+   * Select and load a directory
+   */
+  const selectAndLoadDirectory = useCallback(async (): Promise<string | undefined> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      securityLogger.info(
+        SecurityCategory.FILE_SYSTEM,
+        'Opening directory selection dialog',
+        'useFileSystem.selectAndLoadDirectory'
+      );
+      
+      const selectedDir = await selectDirectory();
+      
+      if (selectedDir) {
+        // Update the current directory and list files
+        setCurrentDirectory(selectedDir);
+        await listFiles(selectedDir);
+        return selectedDir;
+      }
+      return undefined;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to select directory: ${errorMessage}`);
+      securityLogger.error(
+        SecurityCategory.FILE_SYSTEM,
+        `Error selecting directory: ${errorMessage}`,
+        'useFileSystem.selectAndLoadDirectory',
+        { error: err }
+      );
+      return undefined;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [listFiles]);
+
+  // Load files when the component mounts if autoLoad is true
+  useEffect(() => {
+    if (autoLoad && currentDirectory) {
+      listFiles(currentDirectory).catch((err) => {
+        console.error('Failed to auto-load directory:', err);
+      });
+    }
+  }, [autoLoad, currentDirectory, listFiles]);
+
   return {
+    files,
+    currentDirectory,
     isLoading,
     error,
-    getFileDetails,
     listFiles,
-    browseDirectory,
-    browseFiles
+    selectAndLoadDirectory
   };
 }

@@ -10,7 +10,7 @@ import {
   isJsonObject, 
   createObjectValidator,
   createArrayValidator 
-} from '../../utils/security/safeIpc';
+} from '../../utils/security/utilities';
 import { validateUserInput } from '../../utils/helpers/validation';
 
 // Mock the Tauri API

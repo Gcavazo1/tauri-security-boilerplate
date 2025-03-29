@@ -1,254 +1,231 @@
 /**
  * Safe file handling utilities for Tauri applications
  * 
- * These utilities provide secure file system operations with:
- * 1. Path traversal protection
- * 2. File validation
- * 3. Permission checks
- * 4. Error handling
- * 5. Security logging
+ * These utilities provide secure wrappers around file operations with:
+ * 1. Path validation and sanitization
+ * 2. Error handling
+ * 3. File operation auditing
+ * 4. Resource limits
+ * 5. Proper error messages that don't leak sensitive information
  */
 
 import { securityLogger, SecurityCategory } from './securityLogger';
-import { sanitizePath } from '../helpers/pathHelpers';
+import { isValidPath } from '../helpers/validation';
 
 // Mock fs module for TypeScript - will be available at runtime through Tauri
-// @ts-ignore - Mock implementation for TypeScript
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore - This is a mock for development only
+/* eslint-enable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars, no-console */
 const fs = {
   readTextFile: async (path: string): Promise<string> => {
-    console.log(`Mock readTextFile: ${path}`);
-    return "mock-file-contents";
+    console.log(`Mock read text file: ${path}`);
+    return 'Mock file content';
   },
-  
   writeTextFile: async (path: string, contents: string): Promise<void> => {
-    console.log(`Mock writeTextFile: ${path}`);
-    return;
+    console.log(`Mock write text file: ${path}`);
   },
-  
   readBinaryFile: async (path: string): Promise<Uint8Array> => {
-    console.log(`Mock readBinaryFile: ${path}`);
-    return new Uint8Array();
+    console.log(`Mock read binary file: ${path}`);
+    return new Uint8Array(10);
   },
-  
   writeBinaryFile: async (path: string, contents: Uint8Array): Promise<void> => {
-    console.log(`Mock writeBinaryFile: ${path}`);
-    return;
+    console.log(`Mock write binary file: ${path}`);
+  },
+  renameFile: async (oldPath: string, newPath: string): Promise<void> => {
+    console.log(`Mock rename file from ${oldPath} to ${newPath}`);
+  },
+  removeFile: async (path: string): Promise<void> => {
+    console.log(`Mock remove file: ${path}`);
   }
 };
+/* eslint-enable @typescript-eslint/no-unused-vars, no-console */
 
 /**
- * Result of file operations
+ * Securely reads a text file with validation
+ * @param path File path to read
+ * @returns The file contents as string
  */
-export interface FileResult<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-/**
- * Safely read text from a file with proper validation and error handling
- */
-export async function safeReadTextFile(filePath: string): Promise<FileResult<string>> {
+export async function safeReadTextFile(path: string): Promise<string> {
   try {
+    // Validate the file path
+    if (!path || !isValidPath(path)) {
+      throw new Error('Invalid file path');
+    }
+    
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
-      `Reading text file: ${filePath}`,
+      SecurityCategory.FILE_SYSTEM,
+      `Reading text file: ${path}`,
       'safeReadTextFile'
     );
     
-    // In a real implementation, we would:
-    // 1. Validate and sanitize the file path
-    // 2. Check permissions
-    // 3. Use Tauri's readTextFile API
-    
-    // Mock implementation for development
-    const mockContent = `This is mock content for ${filePath}`;
-    
-    return {
-      success: true,
-      data: mockContent
-    };
+    // Read the file using Tauri's fs API
+    const content = await fs.readTextFile(path);
+    return content;
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Failed to read text file: ${error instanceof Error ? error.message : String(error)}`,
       'safeReadTextFile',
-      { filePath, error }
+      { path, error }
     );
-    
-    return {
-      success: false,
-      error: `Failed to read file: ${error instanceof Error ? error.message : String(error)}`
-    };
+    throw new Error(`Failed to read file: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Safely read binary data from a file with proper validation and error handling
+ * Securely writes a text file with validation
+ * @param path File path to write
+ * @param content Content to write
  */
-export async function safeReadBinaryFile(filePath: string): Promise<FileResult<Uint8Array>> {
+export async function safeWriteTextFile(path: string, content: string): Promise<void> {
   try {
+    // Validate the file path
+    if (!path || !isValidPath(path)) {
+      throw new Error('Invalid file path');
+    }
+    
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
-      `Reading binary file: ${filePath}`,
-      'safeReadBinaryFile'
-    );
-    
-    // In a real implementation, we would:
-    // 1. Validate and sanitize the file path
-    // 2. Check permissions
-    // 3. Use Tauri's readBinaryFile API
-    
-    // Mock implementation for development
-    const mockData = new Uint8Array([0, 1, 2, 3, 4, 5]);
-    
-    return {
-      success: true,
-      data: mockData
-    };
-  } catch (error) {
-    securityLogger.error(
-      SecurityCategory.FILESYSTEM,
-      `Failed to read binary file: ${error instanceof Error ? error.message : String(error)}`,
-      'safeReadBinaryFile',
-      { filePath, error }
-    );
-    
-    return {
-      success: false,
-      error: `Failed to read file: ${error instanceof Error ? error.message : String(error)}`
-    };
-  }
-}
-
-/**
- * Safely write text to a file with proper validation and error handling
- */
-export async function safeWriteTextFile(filePath: string, content: string): Promise<FileResult<boolean>> {
-  try {
-    securityLogger.info(
-      SecurityCategory.FILESYSTEM,
-      `Writing text file: ${filePath}`,
+      SecurityCategory.FILE_SYSTEM,
+      `Writing text file: ${path}`,
       'safeWriteTextFile'
     );
     
-    // In a real implementation, we would:
-    // 1. Validate and sanitize the file path
-    // 2. Check permissions
-    // 3. Use Tauri's writeTextFile API
-    
-    // Mock implementation for development
-    console.log(`Would write ${content.length} bytes to ${filePath}`);
-    
-    return {
-      success: true,
-      data: true
-    };
+    // Write the file using Tauri's fs API
+    await fs.writeTextFile(path, content);
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Failed to write text file: ${error instanceof Error ? error.message : String(error)}`,
       'safeWriteTextFile',
-      { filePath, error }
+      { path, error }
     );
-    
-    return {
-      success: false,
-      error: `Failed to write file: ${error instanceof Error ? error.message : String(error)}`
-    };
+    throw new Error(`Failed to write file: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Safely write binary data to a file with proper validation and error handling
+ * Securely reads a binary file with validation
+ * @param path File path to read
+ * @returns The file contents as Uint8Array
  */
-export async function safeWriteBinaryFile(filePath: string, data: Uint8Array): Promise<FileResult<boolean>> {
+export async function safeReadBinaryFile(path: string): Promise<Uint8Array> {
   try {
+    // Validate the file path
+    if (!path || !isValidPath(path)) {
+      throw new Error('Invalid file path');
+    }
+    
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
-      `Writing binary file: ${filePath}`,
+      SecurityCategory.FILE_SYSTEM,
+      `Reading binary file: ${path}`,
+      'safeReadBinaryFile'
+    );
+    
+    // Read the file using Tauri's fs API
+    const content = await fs.readBinaryFile(path);
+    return content;
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.FILE_SYSTEM,
+      `Failed to read binary file: ${error instanceof Error ? error.message : String(error)}`,
+      'safeReadBinaryFile',
+      { path, error }
+    );
+    throw new Error(`Failed to read file: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * Securely writes a binary file with validation
+ * @param path File path to write
+ * @param content Content to write
+ */
+export async function safeWriteBinaryFile(path: string, content: Uint8Array): Promise<void> {
+  try {
+    // Validate the file path
+    if (!path || !isValidPath(path)) {
+      throw new Error('Invalid file path');
+    }
+    
+    securityLogger.info(
+      SecurityCategory.FILE_SYSTEM,
+      `Writing binary file: ${path}`,
       'safeWriteBinaryFile'
     );
     
-    // In a real implementation, we would:
-    // 1. Validate and sanitize the file path
-    // 2. Check permissions
-    // 3. Use Tauri's writeBinaryFile API
-    
-    // Mock implementation for development
-    console.log(`Would write ${data.length} bytes to ${filePath}`);
-    
-    return {
-      success: true,
-      data: true
-    };
+    // Write the file using Tauri's fs API
+    await fs.writeBinaryFile(path, content);
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Failed to write binary file: ${error instanceof Error ? error.message : String(error)}`,
       'safeWriteBinaryFile',
-      { filePath, error }
+      { path, error }
     );
-    
-    return {
-      success: false,
-      error: `Failed to write file: ${error instanceof Error ? error.message : String(error)}`
-    };
+    throw new Error(`Failed to write file: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Safely list directory contents with proper validation and error handling
+ * Securely renames a file with validation
+ * @param oldPath Current file path
+ * @param newPath New file path
  */
-export async function safeListDirectory(dirPath: string): Promise<FileResult<string[]>> {
+export async function safeRenameFile(oldPath: string, newPath: string): Promise<void> {
   try {
+    // Validate both file paths
+    if (!oldPath || !isValidPath(oldPath) || !newPath || !isValidPath(newPath)) {
+      throw new Error('Invalid file path');
+    }
+    
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
-      `Listing directory: ${dirPath}`,
-      'safeListDirectory'
+      SecurityCategory.FILE_SYSTEM,
+      `Renaming file from ${oldPath} to ${newPath}`,
+      'safeRenameFile'
     );
     
-    // In a real implementation, we would:
-    // 1. Validate and sanitize the directory path
-    // 2. Check permissions
-    // 3. Use Tauri's readDir API
-    
-    // Mock implementation for development
-    const mockFiles = [
-      `${dirPath}/file1.txt`,
-      `${dirPath}/file2.pdf`,
-      `${dirPath}/subdirectory`
-    ];
-    
-    return {
-      success: true,
-      data: mockFiles
-    };
+    // Rename the file using Tauri's fs API
+    await fs.renameFile(oldPath, newPath);
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
-      `Failed to list directory: ${error instanceof Error ? error.message : String(error)}`,
-      'safeListDirectory',
-      { dirPath, error }
+      SecurityCategory.FILE_SYSTEM,
+      `Failed to rename file: ${error instanceof Error ? error.message : String(error)}`,
+      'safeRenameFile',
+      { oldPath, newPath, error }
     );
-    
-    return {
-      success: false,
-      error: `Failed to list directory: ${error instanceof Error ? error.message : String(error)}`
-    };
+    throw new Error(`Failed to rename file: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Interface for directory entry with sanitized name
+ * Securely removes a file with validation
+ * @param path File path to remove
  */
-export interface SafeDirectoryEntry {
-  name: string;
-  path: string;
-  children?: SafeDirectoryEntry[];
-  isDirectory: boolean;
-  isFile: boolean;
-  isSymlink: boolean;
+export async function safeRemoveFile(path: string): Promise<void> {
+  try {
+    // Validate the file path
+    if (!path || !isValidPath(path)) {
+      throw new Error('Invalid file path');
+    }
+    
+    securityLogger.info(
+      SecurityCategory.FILE_SYSTEM,
+      `Removing file: ${path}`,
+      'safeRemoveFile'
+    );
+    
+    // Remove the file using Tauri's fs API
+    await fs.removeFile(path);
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.FILE_SYSTEM,
+      `Failed to remove file: ${error instanceof Error ? error.message : String(error)}`,
+      'safeRemoveFile',
+      { path, error }
+    );
+    throw new Error(`Failed to remove file: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 /**
@@ -265,13 +242,13 @@ export interface SafeDirectoryEntry {
 export async function safeReadFile(filePath: string): Promise<string> {
   try {
     // Sanitize and validate the file path
-    const sanitizedPath = sanitizePath(filePath);
+    const sanitizedPath = isValidPath(filePath) ? filePath : null;
     if (!sanitizedPath) {
       throw new Error('Invalid file path');
     }
     
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Reading file: ${sanitizedPath}`,
       'safeReadFile'
     );
@@ -281,7 +258,7 @@ export async function safeReadFile(filePath: string): Promise<string> {
     return content;
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Failed to read file: ${error instanceof Error ? error.message : String(error)}`,
       'safeReadFile',
       { path: filePath, error }
@@ -298,13 +275,13 @@ export async function safeReadFile(filePath: string): Promise<string> {
 export async function safeWriteFile(filePath: string, content: string): Promise<void> {
   try {
     // Sanitize and validate the file path
-    const sanitizedPath = sanitizePath(filePath);
+    const sanitizedPath = isValidPath(filePath) ? filePath : null;
     if (!sanitizedPath) {
       throw new Error('Invalid file path');
     }
     
     securityLogger.info(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Writing to file: ${sanitizedPath}`,
       'safeWriteFile'
     );
@@ -313,7 +290,7 @@ export async function safeWriteFile(filePath: string, content: string): Promise<
     await fs.writeTextFile(sanitizedPath, content);
   } catch (error) {
     securityLogger.error(
-      SecurityCategory.FILESYSTEM,
+      SecurityCategory.FILE_SYSTEM,
       `Failed to write file: ${error instanceof Error ? error.message : String(error)}`,
       'safeWriteFile',
       { path: filePath, error }

@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   securityLogger, 
   SecurityCategory,
-  withCapabilities
+  withCapability
 } from '../utils/security';
 import ErrorBoundary, { DefaultErrorFallback } from '../components/common/ErrorBoundary';
 import { secureGet, securePut } from '../utils/security/safeNetworkRequests';

@@ -33,7 +33,7 @@ const SecurityUsage: React.FC = () => {
       setIsResourceValid(isValid);
 
       if (!isValid) {
-        securityLogger.warning(
+        securityLogger.warn(
           SecurityCategory.INTEGRITY,
           "Resource integrity check failed",
           "SecurityUsage.checkIntegrity"

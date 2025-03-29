@@ -1,150 +1,191 @@
 /**
  * Secure storage utilities for Tauri applications
  * 
- * These utilities provide encrypted storage capabilities with:
- * 1. Data encryption at rest
+ * These utilities provide secure storage mechanisms with:
+ * 1. Encryption for sensitive data
  * 2. Secure key management
- * 3. Data validation
- * 4. Error handling
- * 5. Security logging
+ * 3. Security logging
+ * 4. Memory protection
+ * 5. Secure deletion
  */
 
 import { securityLogger, SecurityCategory } from './securityLogger';
+import { isString } from '../helpers/validation';
 
-/**
- * Result type for data operations
- */
-export interface SecureResult<T> {
-  ok: boolean;
-  value?: T;
-  error?: string;
-}
-
-/**
- * User data structure for secure storage
- */
-export interface SecureUserProfile {
-  id: string;
-  username: string;
-  email: string;
-  preferences: {
-    theme: 'light' | 'dark' | 'system';
-    notifications: boolean;
-  };
-  permissions: string[];
-  lastLogin: string;
-}
-
-// Simple encryption key management
-// In a production app, consider more robust key management
-const getEncryptionKey = (): string => {
-  // Mock implementation - in production, use a secure method to derive or retrieve the key
-  return 'secure-encryption-key-for-development-only';
+// Mock Store module for TypeScript - will be available at runtime through Tauri
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const store = {
+  get: async (key: string): Promise<any> => {
+    // eslint-disable-next-line no-console
+    console.log(`Mock STORE get: ${key}`);
+    return null;
+  },
+  set: async (key: string, value: any): Promise<void> => {
+    // eslint-disable-next-line no-console
+    console.log(`Mock STORE set: ${key} = ${JSON.stringify(value)}`);
+  },
+  delete: async (key: string): Promise<void> => {
+    // eslint-disable-next-line no-console
+    console.log(`Mock STORE delete: ${key}`);
+  },
+  clear: async (): Promise<void> => {
+    // eslint-disable-next-line no-console
+    console.log('Mock STORE clear');
+  }
 };
 
+// Mock encryption helper - will use native crypto APIs in production
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getEncryptionKey(): Promise<string> {
+  return Promise.resolve('mock-encryption-key');
+}
+
 /**
- * Save data securely to storage
+ * Securely stores sensitive data with encryption
+ * @param key The storage key
+ * @param value The value to store
+ * @param sensitive Whether the data is sensitive (will be encrypted)
  */
-export async function secureStore<T>(key: string, data: T): Promise<SecureResult<boolean>> {
+export async function secureStore(key: string, value: any, sensitive = false): Promise<void> {
   try {
+    if (!key || !isString(key)) {
+      throw new Error('Invalid key provided');
+    }
+    
     securityLogger.info(
       SecurityCategory.STORAGE,
-      `Storing data securely with key: ${key}`,
+      `Storing data with key: ${key} (sensitive: ${sensitive})`,
       'secureStore'
     );
     
-    // In a real implementation, we would encrypt and store the data
-    // using Tauri's secure storage APIs
-    // Mock implementation for development
-    console.log(`Securely stored data with key: ${key}`);
+    // For sensitive data, we encrypt before storing
+    let dataToStore = value;
     
-    return { ok: true, value: true };
+    if (sensitive) {
+      // In a real implementation, we would encrypt the data here
+      // For now, we just stringify it with a prefix to simulate encryption
+      dataToStore = JSON.stringify({ 
+        encrypted: true,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        data: `encrypted:${JSON.stringify(value)}` 
+      });
+    }
+    
+    // Store using Tauri's storage API
+    await store.set(key, dataToStore);
+    
   } catch (error) {
     securityLogger.error(
       SecurityCategory.STORAGE,
-      `Secure storage failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to store data: ${error instanceof Error ? error.message : String(error)}`,
       'secureStore',
       { key, error }
     );
-    
-    return { 
-      ok: false,
-      error: `Failed to store data: ${error instanceof Error ? error.message : String(error)}` 
-    };
+    throw new Error(`Storage operation failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Retrieve data securely from storage
+ * Securely retrieves and, if necessary, decrypts stored data
+ * @param key The storage key
+ * @param sensitive Whether the data is sensitive (needs decryption)
+ * @returns The retrieved data
  */
-export async function secureRetrieve<T>(key: string): Promise<SecureResult<T>> {
+export async function secureRetrieve<T>(key: string, sensitive = false): Promise<T | null> {
   try {
+    if (!key || !isString(key)) {
+      throw new Error('Invalid key provided');
+    }
+    
     securityLogger.info(
       SecurityCategory.STORAGE,
-      `Retrieving data securely with key: ${key}`,
+      `Retrieving data with key: ${key} (sensitive: ${sensitive})`,
       'secureRetrieve'
     );
     
-    // In a real implementation, we would retrieve and decrypt the data
-    // using Tauri's secure storage APIs
-    // Mock implementation for development
-    const mockUserData = {
-      id: 'user123',
-      username: 'demo_user',
-      email: 'user@example.com',
-      preferences: {
-        theme: 'system',
-        notifications: true
-      },
-      permissions: ['read', 'write'],
-      lastLogin: new Date().toISOString()
-    } as unknown as T;
+    // Retrieve using Tauri's storage API
+    const storedData = await store.get(key);
     
-    return { ok: true, value: mockUserData };
+    if (!storedData) {
+      return null;
+    }
+    
+    // For sensitive data, we decrypt after retrieving
+    if (sensitive && typeof storedData === 'object' && storedData.encrypted) {
+      // In a real implementation, we would decrypt the data here
+      // For now, we just parse the simulated encrypted data
+      const encryptedString = storedData.data;
+      if (encryptedString && encryptedString.startsWith('encrypted:')) {
+        const decryptedJson = encryptedString.substring(10); // Remove 'encrypted:' prefix
+        return JSON.parse(decryptedJson) as T;
+      }
+    }
+    
+    return storedData as T;
+    
   } catch (error) {
     securityLogger.error(
       SecurityCategory.STORAGE,
-      `Secure retrieval failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to retrieve data: ${error instanceof Error ? error.message : String(error)}`,
       'secureRetrieve',
       { key, error }
     );
-    
-    return { 
-      ok: false,
-      error: `Failed to retrieve data: ${error instanceof Error ? error.message : String(error)}`
-    };
+    throw new Error(`Storage operation failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
 /**
- * Delete data securely from storage
+ * Securely deletes stored data
+ * @param key The storage key
  */
-export async function secureDelete(key: string): Promise<SecureResult<boolean>> {
+export async function secureDelete(key: string): Promise<void> {
   try {
+    if (!key || !isString(key)) {
+      throw new Error('Invalid key provided');
+    }
+    
     securityLogger.info(
       SecurityCategory.STORAGE,
-      `Deleting data securely with key: ${key}`,
+      `Deleting data with key: ${key}`,
       'secureDelete'
     );
     
-    // In a real implementation, we would securely delete the data
-    // using Tauri's secure storage APIs
-    // Mock implementation for development
-    console.log(`Securely deleted data with key: ${key}`);
+    // Delete using Tauri's storage API
+    await store.delete(key);
     
-    return { ok: true, value: true };
   } catch (error) {
     securityLogger.error(
       SecurityCategory.STORAGE,
-      `Secure deletion failed: ${error instanceof Error ? error.message : String(error)}`,
+      `Failed to delete data: ${error instanceof Error ? error.message : String(error)}`,
       'secureDelete',
       { key, error }
     );
+    throw new Error(`Storage operation failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * Securely clears all stored data
+ */
+export async function secureClear(): Promise<void> {
+  try {
+    securityLogger.info(
+      SecurityCategory.STORAGE,
+      'Clearing all stored data',
+      'secureClear'
+    );
     
-    return { 
-      ok: false,
-      error: `Failed to delete data: ${error instanceof Error ? error.message : String(error)}`
-    };
+    // Clear using Tauri's storage API
+    await store.clear();
+    
+  } catch (error) {
+    securityLogger.error(
+      SecurityCategory.STORAGE,
+      `Failed to clear data: ${error instanceof Error ? error.message : String(error)}`,
+      'secureClear',
+      { error }
+    );
+    throw new Error(`Storage operation failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -224,7 +265,7 @@ export class SecureStorage {
         localStorage.setItem(`${this.namespace}:${key}`, encryptedValue);
         
         securityLogger.info(
-          SecurityCategory.DATA_ACCESS,
+          SecurityCategory.STORAGE,
           `Stored encrypted data for key: ${key}`,
           'SecureStorage'
         );
@@ -233,7 +274,7 @@ export class SecureStorage {
       }
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         `Failed to store data for key: ${key}`,
         'SecureStorage',
         { error }
@@ -260,7 +301,7 @@ export class SecureStorage {
         const decryptedValue = this.decrypt(encryptedValue);
         
         securityLogger.info(
-          SecurityCategory.DATA_ACCESS,
+          SecurityCategory.STORAGE,
           `Retrieved and decrypted data for key: ${key}`,
           'SecureStorage'
         );
@@ -271,7 +312,7 @@ export class SecureStorage {
       return storedItem;
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         `Failed to retrieve data for key: ${key}`,
         'SecureStorage',
         { error }
@@ -289,13 +330,13 @@ export class SecureStorage {
       localStorage.removeItem(`${this.namespace}:${key}`);
       
       securityLogger.info(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         `Removed data for key: ${key}`,
         'SecureStorage'
       );
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         `Failed to remove data for key: ${key}`,
         'SecureStorage',
         { error }
@@ -310,14 +351,14 @@ export class SecureStorage {
     try {
       localStorage.clear();
       
-      securityLogger.warning(
-        SecurityCategory.DATA_ACCESS,
+      securityLogger.warn(
+        SecurityCategory.STORAGE,
         'Cleared all stored data',
         'SecureStorage'
       );
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         'Failed to clear all data',
         'SecureStorage',
         { error }
@@ -346,7 +387,7 @@ export class SecureStorage {
       return 'encrypted:' + btoa(String.fromCharCode(...encryptedBytes));
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         'Encryption failed',
         'SecureStorage',
         { error }
@@ -376,7 +417,7 @@ export class SecureStorage {
       return new TextDecoder().decode(decryptedBytes);
     } catch (error) {
       securityLogger.error(
-        SecurityCategory.DATA_ACCESS,
+        SecurityCategory.STORAGE,
         'Decryption failed',
         'SecureStorage',
         { error }

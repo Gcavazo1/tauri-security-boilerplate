@@ -10,6 +10,8 @@
  */
 
 import { securityLogger, SecurityCategory } from './securityLogger';
+// We use isValidUrl in validation functions below, so it's needed
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isValidUrl } from '../helpers/validation';
 
 // Interface for secure request options
@@ -24,6 +26,7 @@ export interface SecurePostOptions<T> extends SecureRequestOptions {
 }
 
 // Mock HTTP module for TypeScript - will be available at runtime through Tauri
+/* eslint-disable no-console, @typescript-eslint/no-unused-vars */
 const http = {
   fetch: async (url: string, options?: any): Promise<any> => {
     console.log(`Mock HTTP fetch: ${url}`);
@@ -36,7 +39,7 @@ const http = {
   },
   
   getClient: () => ({
-    get: async (url: string, options?: any) => {
+    get: async (url: string, _options?: any) => {
       console.log(`Mock HTTP GET: ${url}`);
       return {
         status: 200,
@@ -44,7 +47,7 @@ const http = {
         data: "mock GET response"
       };
     },
-    post: async (url: string, body: any, options?: any) => {
+    post: async (url: string, _body: any, _options?: any) => {
       console.log(`Mock HTTP POST: ${url}`);
       return {
         status: 201,
@@ -52,7 +55,7 @@ const http = {
         data: "mock POST response"
       };
     },
-    put: async (url: string, body: any, options?: any) => {
+    put: async (url: string, _body: any, _options?: any) => {
       console.log(`Mock HTTP PUT: ${url}`);
       return {
         status: 200,
@@ -60,7 +63,7 @@ const http = {
         data: "mock PUT response"
       };
     },
-    delete: async (url: string, options?: any) => {
+    delete: async (url: string, _options?: any) => {
       console.log(`Mock HTTP DELETE: ${url}`);
       return {
         status: 204,
@@ -69,6 +72,7 @@ const http = {
     }
   })
 };
+/* eslint-enable no-console, @typescript-eslint/no-unused-vars */
 
 /**
  * Makes a secure GET request with proper validation and error handling

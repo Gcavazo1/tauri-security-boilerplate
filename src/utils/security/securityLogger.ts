@@ -1,266 +1,120 @@
 /**
- * Security logging utility for tracking security-relevant events
- * Helps detect potential security incidents and assists in forensic analysis
+ * Security logger for tracking and auditing security-relevant events
+ * 
+ * This module provides:
+ * 1. Security event logging
+ * 2. Categorization of security events
+ * 3. Severity levels for triage
+ * 4. Context collection for forensics
+ * 5. Structured output for analysis
  */
-
-// Security event severity levels
-export enum SecurityLevel {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL',
-}
 
 // Security event categories
 export enum SecurityCategory {
-  FILESYSTEM = 'filesystem',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  FILE_SYSTEM = 'file-system',
   NETWORK = 'network',
   STORAGE = 'storage',
-  DATA_ACCESS = 'data_access',
+  VALIDATION = 'validation',
+  SANITIZATION = 'sanitization',
   INTEGRITY = 'integrity',
-  APPLICATION = 'application',
-  AUTHENTICATION = 'authentication',
-  PERMISSIONS = 'permissions',
-  INPUT_VALIDATION = 'input_validation',
-  CRYPTO = 'crypto'
+  CONFIGURATION = 'configuration',
+  API = 'api',
+  GENERAL = 'general'
 }
 
-// Interface for security events
-export interface SecurityEvent {
-  timestamp: string;
-  level: SecurityLevel;
-  category: SecurityCategory;
-  message: string;
-  source: string;
-  data?: unknown;
+// Security log levels
+export enum SecurityLogLevel {
+  DEBUG = 'debug',
+  INFO = 'info',
+  WARN = 'warn',
+  ERROR = 'error',
+  CRITICAL = 'critical'
 }
 
-/**
- * Central security logging class
- * Logs security-relevant events with appropriate context
- */
-export class SecurityLogger {
-  private static instance: SecurityLogger;
-  private logs: SecurityEvent[] = [];
-  private maxLogsInMemory: number = 1000;
-  private logToConsole: boolean = true;
+// Timestamp formatting
+const formatTimestamp = () => {
+  const now = new Date();
+  return now.toISOString();
+};
 
-  private constructor() {}
+// Base log function
+/* eslint-disable no-console */
+const logEvent = (
+  level: SecurityLogLevel,
+  category: SecurityCategory,
+  message: string,
+  source: string,
+  context?: Record<string, unknown>
+) => {
+  const timestamp = formatTimestamp();
+  const logEntry = {
+    timestamp,
+    level,
+    category,
+    message,
+    source,
+    ...(context ? { context } : {})
+  };
 
-  /**
-   * Get singleton instance
-   */
-  public static getInstance(): SecurityLogger {
-    if (!SecurityLogger.instance) {
-      SecurityLogger.instance = new SecurityLogger();
-    }
-    return SecurityLogger.instance;
+  // In a production app, we would send this to a secure logging service
+  // or write it to a secure audit log file
+  // For development, we log to console
+  switch (level) {
+    case SecurityLogLevel.DEBUG:
+      console.debug('[SECURITY]', JSON.stringify(logEntry));
+      break;
+    case SecurityLogLevel.INFO:
+      console.info('[SECURITY]', JSON.stringify(logEntry));
+      break;
+    case SecurityLogLevel.WARN:
+      console.warn('[SECURITY]', JSON.stringify(logEntry));
+      break;
+    case SecurityLogLevel.ERROR:
+    case SecurityLogLevel.CRITICAL:
+      console.error('[SECURITY]', JSON.stringify(logEntry));
+      break;
   }
+  
+  return logEntry;
+};
+/* eslint-enable no-console */
 
-  /**
-   * Configure logger settings
-   */
-  public configure(options: { maxLogsInMemory?: number; logToConsole?: boolean }): void {
-    if (options.maxLogsInMemory !== undefined) {
-      this.maxLogsInMemory = options.maxLogsInMemory;
-    }
-    if (options.logToConsole !== undefined) {
-      this.logToConsole = options.logToConsole;
-    }
-  }
-
-  /**
-   * Log a security event
-   */
-  public log(
-    level: SecurityLevel,
+// Security logger singleton
+export const securityLogger = {
+  debug: (
     category: SecurityCategory,
     message: string,
     source: string,
-    data?: unknown
-  ): void {
-    const event: SecurityEvent = {
-      timestamp: new Date().toISOString(),
-      level,
-      category,
-      message,
-      source,
-      data,
-    };
-
-    // Add to in-memory log
-    this.logs.push(event);
-
-    // Trim logs if they exceed the maximum
-    if (this.logs.length > this.maxLogsInMemory) {
-      this.logs = this.logs.slice(-this.maxLogsInMemory);
-    }
-
-    // Log to console if enabled
-    if (this.logToConsole) {
-      const consoleMethod = this.getConsoleMethod(level);
-      consoleMethod(
-        `[SECURITY][${event.timestamp}][${level}][${category}] ${message}`,
-        data ? data : ''
-      );
-    }
-
-    // For critical events, we could implement additional reporting
-    // mechanisms here, such as sending to a backend service
-    if (level === SecurityLevel.CRITICAL) {
-      this.reportCriticalEvent(event);
-    }
-  }
-
-  /**
-   * Convenience methods for different log levels
-   */
-  public info(
+    context?: Record<string, unknown>
+  ) => logEvent(SecurityLogLevel.DEBUG, category, message, source, context),
+  
+  info: (
     category: SecurityCategory,
     message: string,
     source: string,
-    data?: unknown
-  ): void {
-    this.log(SecurityLevel.INFO, category, message, source, data);
-  }
-
-  public warning(
+    context?: Record<string, unknown>
+  ) => logEvent(SecurityLogLevel.INFO, category, message, source, context),
+  
+  warn: (
     category: SecurityCategory,
     message: string,
     source: string,
-    data?: unknown
-  ): void {
-    this.log(SecurityLevel.WARNING, category, message, source, data);
-  }
-
-  public error(
+    context?: Record<string, unknown>
+  ) => logEvent(SecurityLogLevel.WARN, category, message, source, context),
+  
+  error: (
     category: SecurityCategory,
     message: string,
     source: string,
-    data?: unknown
-  ): void {
-    this.log(SecurityLevel.ERROR, category, message, source, data);
-  }
-
-  public critical(
+    context?: Record<string, unknown>
+  ) => logEvent(SecurityLogLevel.ERROR, category, message, source, context),
+  
+  critical: (
     category: SecurityCategory,
     message: string,
     source: string,
-    data?: unknown
-  ): void {
-    this.log(SecurityLevel.CRITICAL, category, message, source, data);
-  }
-
-  /**
-   * Get all security logs (for admin interfaces, debugging)
-   */
-  public getLogs(): SecurityEvent[] {
-    return [...this.logs];
-  }
-
-  /**
-   * Filter logs by various criteria
-   */
-  public filterLogs(options: {
-    level?: SecurityLevel;
-    category?: SecurityCategory;
-    startTime?: string;
-    endTime?: string;
-    source?: string;
-  }): SecurityEvent[] {
-    return this.logs.filter((log) => {
-      let matches = true;
-      
-      if (options.level && log.level !== options.level) {
-        matches = false;
-      }
-      
-      if (options.category && log.category !== options.category) {
-        matches = false;
-      }
-      
-      if (options.source && log.source !== options.source) {
-        matches = false;
-      }
-      
-      if (options.startTime && log.timestamp < options.startTime) {
-        matches = false;
-      }
-      
-      if (options.endTime && log.timestamp > options.endTime) {
-        matches = false;
-      }
-      
-      return matches;
-    });
-  }
-
-  /**
-   * Clear all logs (use with caution)
-   */
-  public clearLogs(): void {
-    this.logs = [];
-  }
-
-  /**
-   * Export logs to JSON string
-   */
-  public exportLogs(): string {
-    return JSON.stringify(this.logs);
-  }
-
-  /**
-   * Map security level to console method
-   */
-  private getConsoleMethod(level: SecurityLevel): (...data: any[]) => void {
-    switch (level) {
-      case SecurityLevel.INFO:
-        return console.info;
-      case SecurityLevel.WARNING:
-        return console.warn;
-      case SecurityLevel.ERROR:
-      case SecurityLevel.CRITICAL:
-        return console.error;
-      default:
-        return console.log;
-    }
-  }
-
-  /**
-   * Handle reporting of critical security events
-   * In a production app, this would likely send to a backend service
-   */
-  private reportCriticalEvent(event: SecurityEvent): void {
-    // In production, implement more robust reporting here
-    console.error('CRITICAL SECURITY EVENT', event);
-    
-    // This is where you would integrate with your security monitoring
-    // For example, sending to a backend API or local storage
-    // that is regularly checked
-  }
-}
-
-// Export a default instance for convenience
-export const securityLogger = SecurityLogger.getInstance();
-
-/**
- * Example usage:
- * 
- * import { securityLogger, SecurityCategory } from './securityLogger';
- * 
- * // Log an authentication attempt
- * securityLogger.info(
- *   SecurityCategory.AUTHENTICATION,
- *   'User login attempt',
- *   'LoginComponent',
- *   { username: 'user123', success: true }
- * );
- * 
- * // Log a file access attempt
- * securityLogger.warning(
- *   SecurityCategory.FILESYSTEM,
- *   'Attempted to access restricted file',
- *   'FileManager',
- *   { path: '/etc/passwd', user: 'user123' }
- * );
- */ 
+    context?: Record<string, unknown>
+  ) => logEvent(SecurityLogLevel.CRITICAL, category, message, source, context)
+}; 

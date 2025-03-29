@@ -6,14 +6,15 @@ export interface ErrorFallbackProps {
   resetErrorBoundary: () => void;
 }
 
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+export interface ErrorBoundaryProps {
+  fallback: ReactNode;
+  children: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-export interface ErrorBoundaryProps {
-  children: ReactNode;
-  fallback: React.ComponentType<ErrorFallbackProps> | React.ReactElement;
+export interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
 }
 
 /**
@@ -37,13 +38,18 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to the security logger
+    // Log the error
     securityLogger.error(
-      SecurityCategory.APPLICATION,
-      `React error boundary caught an error: ${error.message}`,
+      SecurityCategory.GENERAL,
+      `Error caught in ErrorBoundary: ${error.message}`,
       'ErrorBoundary.componentDidCatch',
       { error, errorInfo }
     );
+    
+    // Call the onError prop if provided
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
   }
 
   resetErrorBoundary = (): void => {
@@ -54,26 +60,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   };
 
   render(): ReactNode {
-    const { hasError, error } = this.state;
-    const { children, fallback } = this.props;
-
-    if (hasError && error) {
-      // If fallback is a component (function or class)
-      if (React.isValidElement(fallback)) {
-        return fallback;
+    if (this.state.hasError) {
+      if (React.isValidElement(this.props.fallback)) {
+        return this.props.fallback;
       }
       
-      // If fallback is a component type (React.ComponentType)
-      const FallbackComponent = fallback as React.ComponentType<ErrorFallbackProps>;
       return (
-        <FallbackComponent
-          error={error}
-          resetErrorBoundary={this.resetErrorBoundary}
-        />
+        <div className="error-boundary p-4 border border-red-300 bg-red-50 rounded">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Something went wrong</h2>
+          <p className="mb-4 text-red-600">{this.state.error?.message}</p>
+          <button
+            onClick={this.resetErrorBoundary}
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Try again
+          </button>
+        </div>
       );
     }
 
-    return children;
+    return this.props.children;
   }
 }
 

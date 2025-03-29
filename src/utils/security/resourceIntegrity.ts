@@ -8,6 +8,7 @@
 import { securityLogger, SecurityCategory } from './securityLogger';
 
 // Mock imports for TypeScript - these will be available at runtime from Tauri
+/* eslint-disable @typescript-eslint/ban-ts-comment, no-console, @typescript-eslint/no-unused-vars */
 // @ts-ignore - Mock implementation for TypeScript
 const fs = {
   readTextFile: async (path: string): Promise<string> => {
@@ -27,6 +28,7 @@ const base64 = {
     return Buffer.from(data, 'base64').toString();
   }
 };
+/* eslint-enable @typescript-eslint/ban-ts-comment, no-console, @typescript-eslint/no-unused-vars */
 
 /**
  * Verify the integrity of application resources
@@ -44,6 +46,7 @@ export async function verifyResourceIntegrity(): Promise<boolean> {
     // against known good values to detect tampering
     
     // Mock implementation for development
+    // eslint-disable-next-line no-console
     console.log("Resource integrity verification completed");
     
     return true;

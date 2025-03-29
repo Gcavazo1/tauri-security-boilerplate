@@ -104,12 +104,15 @@ export function escapeHtml(html: string): string {
 }
 
 /**
- * Validates that input is alphanumeric with optional allowed extra characters
- * @param input The string to validate
- * @param allowedChars Additional allowed characters beyond alphanumeric
- * @returns True if the string contains only allowed characters
+ * Validates if a string contains only alphanumeric characters
+ * @param value The string to validate
+ * @param allowedChars Optional additional allowed characters
+ * @returns Whether the string is alphanumeric (plus allowed chars)
  */
 export function isAlphanumeric(input: string, allowedChars: string = ''): boolean {
+  if (!input) return false;
+  
+  // Create a regex pattern that includes alphanumeric and any additional allowed characters
   const pattern = new RegExp(`^[a-zA-Z0-9${allowedChars.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]+$`);
   return pattern.test(input);
 }
@@ -266,4 +269,96 @@ export function isValidFilename(filename: string): boolean {
   }
   
   return true;
+}
+
+/**
+ * Validates if the input is a valid file path
+ * (Prevents path traversal and other security issues)
+ * @param path The file path to validate
+ * @returns Whether the path is valid
+ */
+export function isValidPath(path: string): boolean {
+  if (!path || typeof path !== 'string') {
+    return false;
+  }
+
+  // Check for path traversal attempts
+  if (path.includes('..') || path.includes('./') || path.includes('/.')) {
+    return false;
+  }
+
+  // Check for null bytes (potential security issue)
+  if (path.includes('\0')) {
+    return false;
+  }
+
+  // Additional checks could be added for specific platforms
+  
+  return true;
+}
+
+/**
+ * Checks if the provided input is a non-empty string
+ * @param value The value to check
+ * @returns Whether the value is a non-empty string
+ */
+export function isString(value: any): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+/**
+ * Validates if a password meets security requirements
+ * @param password The password to validate
+ * @returns Whether the password is secure
+ */
+export function isSecurePassword(password: string): boolean {
+  if (!password || password.length < 8) {
+    return false;
+  }
+  
+  // Check for at least one uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    return false;
+  }
+  
+  // Check for at least one lowercase letter
+  if (!/[a-z]/.test(password)) {
+    return false;
+  }
+  
+  // Check for at least one number
+  if (!/[0-9]/.test(password)) {
+    return false;
+  }
+  
+  // Check for at least one special character
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return false;
+  }
+  
+  return true;
+}
+
+/**
+ * Sanitizes a string to prevent XSS attacks
+ * @param html The string to sanitize
+ * @returns The sanitized string
+ */
+export function sanitizeHtml(html: string): string {
+  return html
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/**
+ * Validates if a string matches a specific format using a regex pattern
+ * @param value The string to validate
+ * @param pattern The regex pattern to test against
+ * @returns Whether the string matches the pattern
+ */
+export function matchesPattern(value: string, pattern: RegExp): boolean {
+  return pattern.test(value);
 } 
