@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tauri Security Boilerplate</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="images/logo.png" alt="Tauri Security Boilerplate Logo">
+                    <h1>Tauri Security Boilerplate</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#getting-started">Getting Started</a></li>
+                        <li><a href="#documentation">Documentation</a></li>
+                        <li><a href="#security">Security</a></li>
+                        <li><a href="https://github.com/Gcavazo1/tauri-security-boilerplate" class="github-link"><i class="fab fa-github"></i> GitHub</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2>Secure by Default Tauri Application Template</h2>
+                <p>A comprehensive security boilerplate for building robust, secure Tauri applications with best practices and defense-in-depth security measures.</p>
+                <div class="cta-buttons">
+                    <a href="#getting-started" class="btn primary">Get Started</a>
+                    <a href="https://github.com/Gcavazo1/tauri-security-boilerplate" class="btn secondary">View on GitHub</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Key Security Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Defense in Depth</h3>
+                    <p>Multiple layers of security controls to protect against a wide range of threats.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-lock"></i>
+                    </div>
+                    <h3>Capability-based Security</h3>
+                    <p>Fine-grained permission system using capability-based security principles.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <h3>Secure IPC</h3>
+                    <p>Hardened communication between frontend and backend with validation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3>Secure Storage</h3>
+                    <p>Encrypted data storage with protection against unauthorized access.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Security Logging</h3>
+                    <p>Comprehensive logging of security events for audit and monitoring.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3>Secure File Access</h3>
+                    <p>Safe file operations with path traversal protection and validation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="getting-started" class="getting-started">
+        <div class="container">
+            <h2>Getting Started</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Clone the Repository</h3>
+                        <div class="code-block">
+                            <pre><code>git clone https://github.com/Gcavazo1/tauri-security-boilerplate.git
+cd tauri-security-boilerplate</code></pre>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Install Dependencies</h3>
+                        <div class="code-block">
+                            <pre><code>npm install</code></pre>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Start Development Server</h3>
+                        <div class="code-block">
+                            <pre><code>npm run tauri dev</code></pre>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Build for Production</h3>
+                        <div class="code-block">
+                            <pre><code>npm run tauri build</code></pre>
+                            <button class="copy-btn" onclick="copyCode(this)">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="documentation" class="documentation">
+        <div class="container">
+            <h2>Documentation</h2>
+            <div class="doc-grid">
+                <a href="ARCHITECTURE.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h3>Architecture Overview</h3>
+                    <p>Understand the security architecture of the boilerplate.</p>
+                </a>
+                <a href="EXAMPLES.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3>Examples</h3>
+                    <p>Sample applications and use cases demonstrating security features.</p>
+                </a>
+                <a href="CONTRIBUTING.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Contributing</h3>
+                    <p>Guidelines for contributing to the project.</p>
+                </a>
+                <a href="CODE_OF_CONDUCT.md" class="doc-card">
+                    <div class="doc-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Code of Conduct</h3>
+                    <p>Our community standards and expectations.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="security" class="security">
+        <div class="container">
+            <h2>Security Principles</h2>
+            <div class="security-principles">
+                <div class="principle">
+                    <h3><i class="fas fa-lock"></i> Fail Securely</h3>
+                    <p>When a system fails, it should not default to an insecure state.</p>
+                </div>
+                <div class="principle">
+                    <h3><i class="fas fa-chess-rook"></i> Defense in Depth</h3>
+                    <p>Multiple layers of security, so if one fails, others will still protect the system.</p>
+                </div>
+                <div class="principle">
+                    <h3><i class="fas fa-filter"></i> Complete Mediation</h3>
+                    <p>Every access to every resource must be checked for authorization.</p>
+                </div>
+                <div class="principle">
+                    <h3><i class="fas fa-door-open"></i> Principle of Least Privilege</h3>
+                    <p>Every component should only have access to resources it needs to function.</p>
+                </div>
+                <div class="principle">
+                    <h3><i class="fas fa-brain"></i> Psychological Acceptability</h3>
+                    <p>Security mechanisms should not make the resource more difficult to access than without them.</p>
+                </div>
+                <div class="principle">
+                    <h3><i class="fas fa-shield-alt"></i> Secure by Design</h3>
+                    <p>Security is built into the design from the beginning, not added later.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo-small.png" alt="Tauri Security Boilerplate Logo">
+                    <p>Tauri Security Boilerplate</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Project</h4>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#getting-started">Getting Started</a></li>
+                            <li><a href="#documentation">Documentation</a></li>
+                            <li><a href="#security">Security</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Community</h4>
+                        <ul>
+                            <li><a href="https://github.com/Gcavazo1/tauri-security-boilerplate">GitHub</a></li>
+                            <li><a href="https://github.com/Gcavazo1/tauri-security-boilerplate/issues">Issues</a></li>
+                            <li><a href="CONTRIBUTING.md">Contributing</a></li>
+                            <li><a href="CODE_OF_CONDUCT.md">Code of Conduct</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Tauri Security Boilerplate. Licensed under MIT.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.previousElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const icon = button.querySelector('i');
+                icon.className = 'fas fa-check';
+                
+                setTimeout(() => {
+                    icon.className = 'far fa-copy';
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
