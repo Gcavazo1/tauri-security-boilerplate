@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [clean-branch]
 
+# Add explicit permissions for GitHub Actions
+permissions:
+  contents: write
+  packages: write
+  issues: read
+  pull-requests: read
+
 jobs:
   security-audit:
     name: Security Audit
